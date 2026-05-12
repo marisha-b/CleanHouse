@@ -46,7 +46,6 @@ router.post('/worker-login', async (req, res) => {
     try {
         const { role, phone, password } = req.body;
         
-        console.log('🔐 Вход сотрудника:', { role, phone, password: '***' });
         
         if (!role || !password) {
             return res.status(400).json({ error: 'Заполните все поля' });
@@ -72,7 +71,6 @@ router.post('/worker-login', async (req, res) => {
         
         const result = await pool.query(query, params);
         
-        console.log(`📊 Найдено пользователей: ${result.rows.length}`);
         
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'Пользователь не найден' });
@@ -99,7 +97,6 @@ router.post('/worker-login', async (req, res) => {
             }
         }
         
-        console.log(`✅ Успешный вход: ${user.full_name} (${user.role})`);
         
         res.json({ 
             success: true, 
@@ -112,7 +109,7 @@ router.post('/worker-login', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('❌ Ошибка входа сотрудника:', err);
+        console.error('Ошибка входа сотрудника:', err);
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
@@ -122,7 +119,6 @@ router.post('/client-login', async (req, res) => {
     try {
         let { phone, password } = req.body;
         
-        console.log('🔐 Вход клиента:', { phone, password: '***' });
         
         if (!phone || !phone.trim()) {
             return res.status(400).json({ error: 'Введите телефон' });
@@ -146,7 +142,6 @@ router.post('/client-login', async (req, res) => {
         }
         
         const user = result.rows[0];
-        console.log(`✅ Успешный вход клиента: ${user.full_name} (${user.phone})`);
         
         res.json({ 
             success: true, 
@@ -161,7 +156,7 @@ router.post('/client-login', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('❌ Ошибка входа клиента:', err);
+
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
@@ -171,7 +166,6 @@ router.post('/client-register', async (req, res) => {
     try {
         let { full_name, phone, email, password } = req.body;
         
-        console.log('📝 Регистрация клиента:', { full_name, phone, email });
         
         // Проверка имени
         if (!full_name || full_name.trim().length < 2) {
@@ -220,7 +214,6 @@ router.post('/client-register', async (req, res) => {
         );
         
         const user = result.rows[0];
-        console.log('✅ Клиент зарегистрирован:', user);
         
         res.json({ 
             success: true, 
@@ -235,7 +228,7 @@ router.post('/client-register', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('❌ Ошибка регистрации клиента:', err);
+
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
