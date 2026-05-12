@@ -5,7 +5,7 @@
         
         <!-- Форма входа -->
         <div id="clientLoginForm">
-            <h2 style="color: #5D4A36; margin-bottom: 20px; text-align: center;">👤 Вход для клиентов</h2>
+            <h2 style="color: #5D4A36; margin-bottom: 20px; text-align: center;">Вход для клиентов</h2>
             
             <div class="form-group">
                 <label>Телефон *</label>
@@ -20,7 +20,7 @@
             <button id="submitClientLogin" class="client-submit-btn">Войти</button>
             
             <div style="text-align: center; margin-top: 15px;">
-                <a href="#" id="showRegisterBtn" style="color:#8B7355; text-decoration:none;">📝 Нет аккаунта? Зарегистрироваться</a>
+                <a href="#" id="showRegisterBtn" style="color:#8B7355; text-decoration:none;">Нет аккаунта? Зарегистрироваться</a>
             </div>
             
             <div id="loginError" style="color:#f44336; text-align:center; margin-top:15px; display:none; font-size:0.85rem;"></div>
@@ -28,7 +28,7 @@
         
         <!-- Форма регистрации -->
         <div id="clientRegisterForm" style="display: none;">
-            <h2 style="color: #5D4A36; margin-bottom: 20px; text-align: center;">📝 Регистрация</h2>
+            <h2 style="color: #5D4A36; margin-bottom: 20px; text-align: center;">Регистрация</h2>
             
             <div class="form-group">
                 <label>Ваше имя *</label>
@@ -54,7 +54,7 @@
             <button id="submitRegister" class="client-submit-btn">Зарегистрироваться</button>
             
             <div style="text-align: center; margin-top: 15px;">
-                <a href="#" id="showLoginBtn" style="color:#8B7355; text-decoration:none;">🔙 Уже есть аккаунт? Войти</a>
+                <a href="#" id="showLoginBtn" style="color:#8B7355; text-decoration:none;">Уже есть аккаунт? Войти</a>
             </div>
             
             <div id="registerError" style="color:#f44336; text-align:center; margin-top:15px; display:none; font-size:0.85rem;"></div>
@@ -161,7 +161,6 @@ small {
 
 <script>
 (function() {
-    console.log('🔧 Инициализация модалки клиентов с проверками');
     
     // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
     
@@ -282,12 +281,12 @@ small {
             const password = document.getElementById('clientPasswordLogin')?.value;
             
             if (!phone) {
-                showError(loginError, '❌ Введите телефон');
+                showError(loginError, 'Введите телефон');
                 highlightError(document.getElementById('clientPhoneLogin'));
                 return;
             }
             if (!password) {
-                showError(loginError, '❌ Введите пароль');
+                showError(loginError, 'Введите пароль');
                 highlightError(document.getElementById('clientPasswordLogin'));
                 return;
             }
@@ -295,7 +294,7 @@ small {
             const cleanPhone = getCleanPhone(phone);
             
             if (cleanPhone.length !== 11) {
-                showError(loginError, '❌ Телефон должен содержать 11 цифр (например: 79123456789)');
+                showError(loginError, 'Телефон должен содержать 11 цифр (например: 79123456789)');
                 highlightError(document.getElementById('clientPhoneLogin'));
                 return;
             }
@@ -326,10 +325,10 @@ small {
                     
                     window.location.reload();
                 } else {
-                    showError(loginError, data.error || '❌ Неверный телефон или пароль');
+                    showError(loginError, data.error || 'Неверный телефон или пароль');
                 }
             } catch(e) {
-                showError(loginError, '❌ Ошибка соединения с сервером');
+                showError(loginError, 'Ошибка соединения с сервером');
                 console.error(e);
             } finally {
                 this.disabled = false;
@@ -338,7 +337,7 @@ small {
         };
     }
     
-    // ========== РЕГИСТРАЦИЯ (без подтверждения пароля) ==========
+    // ========== РЕГИСТРАЦИЯ ==========
     if (submitRegister) {
         submitRegister.onclick = async function() {
             const name = document.getElementById('registerName')?.value.trim();
@@ -350,7 +349,7 @@ small {
             
             // 1. Имя
             if (!validateName(name)) {
-                showError(registerError, '❌ Имя должно содержать только буквы (2-50 символов)');
+                showError(registerError, 'Имя должно содержать только буквы (2-50 символов)');
                 highlightError(document.getElementById('registerName'));
                 return;
             }
@@ -359,20 +358,20 @@ small {
             const cleanPhone = getCleanPhone(phone);
             
             if (cleanPhone.length !== 11) {
-                showError(registerError, `❌ Телефон должен содержать 11 цифр (например: 79123456789). Сейчас: ${cleanPhone.length} цифр`);
+                showError(registerError, `Телефон должен содержать 11 цифр (например: 79123456789). Сейчас: ${cleanPhone.length} цифр`);
                 highlightError(document.getElementById('registerPhone'));
                 return;
             }
             
             if (!cleanPhone.startsWith('7')) {
-                showError(registerError, '❌ Телефон должен начинаться с 7 (например: 79123456789)');
+                showError(registerError, 'Телефон должен начинаться с 7 (например: 79123456789)');
                 highlightError(document.getElementById('registerPhone'));
                 return;
             }
             
             // 3. Email (если указан)
             if (email && !validateEmail(email)) {
-                showError(registerError, '❌ Введите корректный email (например: name@domain.ru)');
+                showError(registerError, 'Введите корректный email (например: name@domain.ru)');
                 highlightError(document.getElementById('registerEmail'));
                 return;
             }
@@ -380,7 +379,7 @@ small {
             // 4. Пароль
             if (!validatePassword(password)) {
                 const len = password ? password.length : 0;
-                showError(registerError, `❌ Пароль должен быть от 4 до 50 символов. Сейчас: ${len}`);
+                showError(registerError, `Пароль должен быть от 4 до 50 символов. Сейчас: ${len}`);
                 highlightError(document.getElementById('registerPassword'));
                 return;
             }
@@ -403,7 +402,7 @@ small {
                 const data = await res.json();
                 
                 if (res.ok && data.success) {
-                    alert('✅ Регистрация успешна! Теперь войдите.');
+                    alert('Регистрация успешна! Теперь войдите.');
                     if (loginForm) loginForm.style.display = 'block';
                     if (registerForm) registerForm.style.display = 'none';
                     
@@ -425,10 +424,10 @@ small {
                     
                     if (loginError) loginError.style.display = 'none';
                 } else {
-                    showError(registerError, data.error || '❌ Ошибка регистрации');
+                    showError(registerError, data.error || 'Ошибка регистрации');
                 }
             } catch(e) {
-                showError(registerError, '❌ Ошибка соединения с сервером');
+                showError(registerError, 'Ошибка соединения с сервером');
                 console.error(e);
             } finally {
                 this.disabled = false;
@@ -437,6 +436,5 @@ small {
         };
     }
     
-    console.log('✅ Модалка клиентов готова, поле подтверждения пароля удалено');
 })();
 </script>
