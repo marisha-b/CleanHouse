@@ -1,0 +1,45 @@
+<!-- Футер -->
+<footer class="footer" id="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <img src="img/логотип.png" alt="Чистый дом" class="footer-logo-img">
+                    <span class="footer-company-name">Чистый дом</span>
+                </div>
+                <div class="footer-address">30-й квартал, ул. 3-го Июля, 15</div>
+                <div class="footer-social">
+                    <a href="#" class="footer-social-link"><img src="img/telegram.png" alt="Telegram"></a>
+                    <a href="#" class="footer-social-link"><img src="img/whatsapp.png" alt="WhatsApp"></a>
+                    <a href="#" class="footer-social-link"><img src="img/vk.png" alt="VK"></a>
+                </div>
+            </div>
+            <div class="footer-right">
+                <div class="footer-phone"><a href="tel:+79500884694">+7 (950) 088-46-94</a></div>
+                <div class="footer-email"><a href="mailto:info@chistdom.ru">info@chistdom.ru</a></div>
+            </div>
+        </div>
+        <div class="footer-copyright"><p>&copy; 2026 Чистый дом. Все права защищены.</p></div>
+    </div>
+</footer>
+
+<style>
+.footer { background: linear-gradient(135deg, #1a1a1a, #2a2a2a); color: #fff; padding: 40px 0 20px; margin-top: 60px; }
+.footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 30px; }
+.footer-logo { display: flex; align-items: center; gap: 12px; }
+.footer-logo-img { height: 40px; }
+.footer-company-name { font-size: 1.3rem; font-weight: 600; }
+.footer-address { color: #ccc; margin-top: 10px; }
+.footer-social { display: flex; gap: 15px; margin-top: 15px; }
+.footer-social-link img { height: 28px; opacity: 0.8; transition: 0.3s; }
+.footer-social-link:hover img { opacity: 1; transform: scale(1.1); }
+.footer-right { text-align: right; }
+.footer-phone a, .footer-email a { color: white; text-decoration: none; }
+.footer-phone a:hover, .footer-email a:hover { color: #FFE74A; }
+.footer-copyright { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; color: #888; }
+@media (max-width: 768px) {
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-right { text-align: center; }
+    .footer-social { justify-content: center; }
+}
+</style>

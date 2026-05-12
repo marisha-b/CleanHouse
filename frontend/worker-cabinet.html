@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабинет сотрудника | Чистый дом</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f8f9fa 0%, #f0e9e0 100%); min-height: 100vh; }
+        
+        .navbar { background: #1a1a1a; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 15px 20px; }
+        .nav-menu { display: flex; list-style: none; gap: 25px; }
+        .nav-link { color: white; text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: #FFE74A; }
+        .burger-menu { display: none; flex-direction: column; cursor: pointer; }
+        .burger-menu span { width: 25px; height: 3px; background: white; margin: 3px 0; transition: 0.3s; }
+        
+        .worker-cabinet { max-width: 1200px; margin: 100px auto 40px; padding: 0 20px; }
+        .worker-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; }
+        .worker-header h1 { font-size: 1.8rem; color: #5D4A36; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-bottom: 40px; }
+        .stat-card { background: white; border-radius: 24px; padding: 25px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #5D4A36; }
+        .stat-label { color: #666; font-size: 0.85rem; margin-top: 8px; }
+        
+        .shift-item { background: white; border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid #e8e0d5; transition: box-shadow 0.3s; }
+        .shift-item:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .shift-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+        .shift-address { background: #f8f5f0; padding: 8px; border-radius: 8px; margin: 10px 0; font-size: 0.9rem; }
+        .status { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .status-completed { background: #e8f5e9; color: #388e3c; }
+        .status-scheduled { background: #e3f2fd; color: #1976d2; }
+        .status-in-progress { background: #fff3e0; color: #ff9800; }
+        
+        .report-form { background: #f8f5f0; border-radius: 20px; padding: 25px; margin-top: 30px; }
+        .report-form input, .report-form textarea, .report-form select { width: 100%; padding: 12px; border: 2px solid #e8e0d5; border-radius: 12px; margin-bottom: 15px; font-size: 1rem; transition: border-color 0.3s; }
+        .report-form input:focus, .report-form textarea:focus, .report-form select:focus { outline: none; border-color: #8B7355; }
+        .btn-submit { background: #5D4A36; color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-submit:hover { background: #8B7355; transform: translateY(-2px); }
+        
+        .review-item { background: white; border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid #e8e0d5; transition: box-shadow 0.3s; }
+        .review-item:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .stars { color: #FFD700; font-size: 1.1rem; letter-spacing: 2px; }
+        
+        /* Стили для калькулятора зарплаты */
+        .salary-calculator { background: white; border-radius: 20px; padding: 25px; margin-top: 30px; border: 1px solid #e8e0d5; }
+        .salary-calculator h3 { color: #5D4A36; margin-bottom: 20px; }
+        .date-range { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
+        .date-range label { font-weight: 500; color: #333; margin-right: 5px; }
+        .date-range input { flex: 1; padding: 10px 12px; border: 2px solid #e8e0d5; border-radius: 10px; font-size: 0.95rem; min-width: 130px; }
+        .date-range input:focus { outline: none; border-color: #8B7355; }
+        .btn-calc { background: #2196F3; color: white; border: none; padding: 10px 24px; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-calc:hover { background: #1976D2; transform: translateY(-2px); }
+        .btn-download { background: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.3s; margin-top: 20px; width: 100%; }
+        .btn-download:hover { background: #45a049; transform: translateY(-2px); }
+        
+        /* Стили для таблицы детализации */
+        .hours-detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .hours-detail-table th {
+            background: #5D4A36;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e8e0d5;
+            font-weight: 600;
+        }
+        .hours-detail-table td {
+            padding: 10px;
+            border: 1px solid #e8e0d5;
+            text-align: left;
+            vertical-align: top;
+        }
+        .hours-detail-table tr:hover {
+            background: #f8f5f0;
+        }
+        
+        .total-salary { font-size: 1.3rem; font-weight: 700; color: #5D4A36; margin-top: 20px; padding-top: 15px; border-top: 2px solid #e8e0d5; text-align: right; }
+        
+        .salary-result { background: #f8f5f0; border-radius: 16px; padding: 20px; margin-top: 20px; }
+        .salary-header { text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e8e0d5; }
+        .salary-header h4 { font-size: 1.2rem; color: #5D4A36; }
+        .salary-info { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin: 15px 0; padding: 15px; background: white; border-radius: 12px; }
+        .salary-info-item { text-align: center; flex: 1; min-width: 120px; }
+        .salary-info-item .label { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
+        .salary-info-item .value { font-size: 1.3rem; font-weight: 700; color: #5D4A36; }
+        .salary-info-item.net .value { color: #4CAF50; font-size: 1.5rem; }
+        
+        .btn-logout { background: #cc0000; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; transition: all 0.3s; }
+        .btn-logout:hover { background: #990000; transform: translateY(-2px); }
+        .btn-clear-cache { background: #8B7355; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; margin-left: 10px; transition: all 0.3s; }
+        .btn-clear-cache:hover { background: #5D4A36; transform: translateY(-2px); }
+        
+        @media (max-width: 768px) { 
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .date-range { flex-direction: column; align-items: stretch; }
+            .hours-detail-table { font-size: 0.75rem; }
+            .hours-detail-table th, .hours-detail-table td { padding: 6px; }
+            .worker-header { flex-direction: column; gap: 15px; text-align: center; }
+            .burger-menu { display: flex; }
+            .nav-menu { display: none; position: fixed; top: 0; left: -100%; width: 80%; height: 100vh; background: #1a1a1a; flex-direction: column; padding: 70px 20px; gap: 0; }
+            .nav-menu.active { left: 0; display: flex; }
+            .salary-info { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="burger-menu" id="burgerMenu">
+            <span></span><span></span><span></span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Главная</a></li>
+            <li><a href="prices.html" class="nav-link">Цены</a></li>
+            <li><a href="schedule.html" class="nav-link">Расписание</a></li>
+            <li><a href="worker-cabinet.html" class="nav-link">🧹 Мой кабинет</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="worker-cabinet">
+    <div class="worker-header">
+        <h1>🧹 Кабинет сотрудника</h1>
+        <div>
+            <button class="btn-clear-cache" onclick="clearCache()">🗑️ Очистить кэш</button>
+            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="rating">-</div><div class="stat-label">⭐ Рейтинг</div></div>
+        <div class="stat-card"><div class="stat-value" id="hourlyRate">-</div><div class="stat-label">💰 Ставка (₽/час)</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalEarned">-</div><div class="stat-label">💵 Заработано всего</div></div>
+        <div class="stat-card"><div class="stat-value" id="ordersCount">-</div><div class="stat-label">✅ Выполнено заказов</div></div>
+    </div>
+    
+    <h2>📅 Мои смены</h2>
+    <div id="shiftsContainer">Загрузка...</div>
+    
+    <h2>📸 Загрузить отчёт</h2>
+    <div class="report-form">
+        <select id="reportShiftId">
+            <option value="">-- Выберите смену --</option>
+        </select>
+        <input type="file" id="beforePhoto" accept="image/*">
+        <label>Фото "до"</label>
+        <input type="file" id="afterPhoto" accept="image/*">
+        <label>Фото "после"</label>
+        <textarea id="reportComment" rows="3" placeholder="Комментарий к выполненной работе"></textarea>
+        <button class="btn-submit" onclick="submitReport()">📤 Отправить отчёт</button>
+    </div>
+    
+    <h2>💰 Калькулятор зарплаты</h2>
+    <div class="salary-calculator">
+        <div class="date-range">
+            <label>Начало периода:</label>
+            <input type="date" id="salaryStartDate">
+            <label>Конец периода:</label>
+            <input type="date" id="salaryEndDate">
+            <button class="btn-calc" onclick="calculateSalary()">📊 Рассчитать</button>
+        </div>
+        
+        <div id="salaryResult" class="salary-result" style="display: none;">
+            <div class="salary-header">
+                <h4>💰 Результат расчёта</h4>
+                <p id="salaryPeriodDisplay"></p>
+            </div>
+            <div class="salary-info">
+                <div class="salary-info-item">
+                    <div class="label">⏱️ Отработано часов</div>
+                    <div class="value" id="displayTotalHours">--</div>
+                </div>
+                <div class="salary-info-item">
+                    <div class="label">💵 Ставка</div>
+                    <div class="value" id="displayHourlyRate">--</div>
+                </div>
+                <div class="salary-info-item net">
+                    <div class="label">🏦 Итого к выплате</div>
+                    <div class="value" id="displayTotalEarnings">--</div>
+                </div>
+            </div>
+            <button class="btn-download" onclick="downloadPayslip()" id="downloadBtn" style="display: none;">📄 Скачать расчётный лист</button>
+        </div>
+        
+        <div id="hoursDetails" style="display: none; margin-top: 20px;">
+            <h4>📋 Детализация по часам</h4>
+            <div id="hoursDetailsTable"></div>
+            <div class="total-salary" id="totalSalaryDisplay"></div>
+        </div>
+    </div>
+    
+    <h2>💬 Отзывы о моей работе</h2>
+    <div id="reviewsContainer">Загрузка...</div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || user.role !== 'worker') {
+        window.location.href = 'index.html';
+    }
+    
+    let currentPayslipData = null;
+    
+    // Установка дат по умолчанию
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    document.getElementById('salaryStartDate').value = firstDay.toISOString().split('T')[0];
+    document.getElementById('salaryEndDate').value = lastDay.toISOString().split('T')[0];
+    
+    async function clearCache() {
+        try {
+            await fetch('/api/cache/clear', { method: 'POST' });
+            if (window.apiCache) window.apiCache.clear();
+            alert('✅ Кэш очищен');
+            loadShifts();
+            loadStats();
+        } catch(e) {
+            console.error(e);
+            alert('Ошибка очистки кэша');
+        }
+    }
+    
+    async function loadStats() {
+        try {
+            const [statsRes, rateRes] = await Promise.all([
+                fetch(`/api/workers/${user.id}/stats`),
+                fetch(`/api/salary/worker/${user.id}`)
+            ]);
+            const stats = await statsRes.json();
+            const salaryData = await rateRes.json();
+            
+            document.getElementById('rating').textContent = stats.rating || 0;
+            document.getElementById('hourlyRate').textContent = (salaryData.hourly_rate || 500).toLocaleString() + ' ₽';
+            document.getElementById('totalEarned').textContent = (salaryData.total_earnings || 0).toLocaleString() + ' ₽';
+            document.getElementById('ordersCount').textContent = stats.orders_count || 0;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadShifts() {
+        try {
+            const res = await fetch(`/api/shifts/worker/${user.id}`);
+            const shifts = await res.json();
+            const container = document.getElementById('shiftsContainer');
+            const select = document.getElementById('reportShiftId');
+            
+            if (shifts.length === 0) {
+                container.innerHTML = '<p>Нет назначенных смен</p>';
+                select.innerHTML = '<option value="">-- Нет смен --</option>';
+            } else {
+                container.innerHTML = shifts.map(s => `
+                    <div class="shift-item">
+                        <div class="shift-header">
+                            <span>📅 ${new Date(s.shift_date).toLocaleDateString()}</span>
+                            <span>⏰ ${s.start_time?.substring(0,5)} - ${s.end_time?.substring(0,5)}</span>
+                            <span class="status status-${s.status === 'completed' ? 'completed' : s.status === 'in_progress' ? 'in-progress' : 'scheduled'}">
+                                ${s.status === 'completed' ? '✅ Выполнена' : s.status === 'in_progress' ? '🔄 В работе' : '⏳ Запланирована'}
+                            </span>
+                        </div>
+                        ${s.address ? `<div class="shift-address">📍 Адрес: ${escapeHtml(s.address)}</div>` : ''}
+                        <div>📋 ${s.description || 'Рабочая смена'}</div>
+                        ${s.order_id ? `<div>📦 Заказ #${s.order_id}</div>` : ''}
+                        ${s.actual_hours ? `<div>⏱️ Отработано часов: ${s.actual_hours}</div>` : ''}
+                    </div>
+                `).join('');
+                
+                select.innerHTML = '<option value="">-- Выберите смену --</option>' + 
+                    shifts.filter(s => s.status !== 'completed').map(s => `<option value="${s.id}">${new Date(s.shift_date).toLocaleDateString()} - ${s.description || 'Смена'}${s.address ? ' - ' + s.address.substring(0,30) : ''}</option>`).join('');
+            }
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadReviews() {
+        try {
+            const res = await fetch(`/api/reviews/worker/${user.id}`);
+            const reviews = await res.json();
+            const container = document.getElementById('reviewsContainer');
+            if (reviews.length === 0) {
+                container.innerHTML = '<p>Нет отзывов</p>';
+            } else {
+                container.innerHTML = reviews.map(r => `
+                    <div class="review-item">
+                        <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+                        <p style="margin: 10px 0;">"${escapeHtml(r.comment)}"</p>
+                        <small>${new Date(r.created_at).toLocaleDateString()}</small>
+                        ${r.address ? `<small> - 📍 ${escapeHtml(r.address)}</small>` : ''}
+                    </div>
+                `).join('');
+            }
+        } catch(e) { console.error(e); }
+    }
+    
+    async function submitReport() {
+        const shiftId = document.getElementById('reportShiftId').value;
+        const comment = document.getElementById('reportComment').value;
+        const beforeFile = document.getElementById('beforePhoto').files[0];
+        const afterFile = document.getElementById('afterPhoto').files[0];
+        
+        if (!shiftId) { alert('Выберите смену'); return; }
+        
+        const formData = new FormData();
+        formData.append('shift_id', shiftId);
+        formData.append('comment', comment);
+        if (beforeFile) formData.append('before_photo', beforeFile);
+        if (afterFile) formData.append('after_photo', afterFile);
+        
+        const submitBtn = document.querySelector('.report-form .btn-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Отправка...';
+        
+        try {
+            const res = await fetch('/api/reports', { method: 'POST', body: formData });
+            if (res.ok) {
+                alert('✅ Отчёт отправлен!');
+                document.getElementById('reportComment').value = '';
+                document.getElementById('beforePhoto').value = '';
+                document.getElementById('afterPhoto').value = '';
+                await loadShifts();
+                await loadStats();
+                await clearCache();
+            } else {
+                alert('❌ Ошибка отправки');
+            }
+        } catch(e) { alert('Ошибка: ' + e.message); }
+        finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '📤 Отправить отчёт';
+        }
+    }
+    
+    async function calculateSalary() {
+        const startDate = document.getElementById('salaryStartDate').value;
+        const endDate = document.getElementById('salaryEndDate').value;
+        
+        if (!startDate || !endDate) {
+            alert('Выберите период');
+            return;
+        }
+        
+        const calcBtn = document.querySelector('.salary-calculator .btn-calc');
+        calcBtn.disabled = true;
+        calcBtn.textContent = 'Расчёт...';
+        
+        try {
+            const res = await fetch(`/api/salary/worker/${user.id}/details?startDate=${startDate}&endDate=${endDate}`);
+            const data = await res.json();
+            
+            if (!data || data.length === 0) {
+                document.getElementById('salaryResult').style.display = 'none';
+                document.getElementById('hoursDetails').style.display = 'none';
+                alert('Нет данных за выбранный период');
+                return;
+            }
+            
+            let totalHours = 0;
+            let totalEarnings = 0;
+            
+            // Формируем HTML таблицы
+            let tableHtml = '<table class="hours-detail-table" style="width:100%; border-collapse:collapse;">';
+            tableHtml += '<thead><tr style="background:#5D4A36; color:white;">';
+            tableHtml += '<th style="padding:10px; border:1px solid #e8e0d5;">Дата</th>';
+            tableHtml += '<th style="padding:10px; border:1px solid #e8e0d5;">Часы</th>';
+            tableHtml += '<th style="padding:10px; border:1px solid #e8e0d5;">Ставка</th>';
+            tableHtml += '<th style="padding:10px; border:1px solid #e8e0d5;">Заработок</th>';
+            tableHtml += '<th style="padding:10px; border:1px solid #e8e0d5;">Адрес</th>';
+            tableHtml += '</tr></thead><tbody>';
+            
+            for (const item of data) {
+                const hours = parseFloat(item.actual_hours) || 0;
+                const earnings = parseFloat(item.earnings) || 0;
+                totalHours += hours;
+                totalEarnings += earnings;
+                
+                let dateStr = '';
+                if (item.shift_date) {
+                    const date = new Date(item.shift_date);
+                    dateStr = date.toLocaleDateString();
+                }
+                
+                tableHtml += '<tr>';
+                tableHtml += '<td style="padding:10px; border:1px solid #e8e0d5;">' + dateStr + '</td>';
+                tableHtml += '<td style="padding:10px; border:1px solid #e8e0d5;">' + hours + '</td>';
+                tableHtml += '<td style="padding:10px; border:1px solid #e8e0d5;">' + item.hourly_rate + ' ₽</td>';
+                tableHtml += '<td style="padding:10px; border:1px solid #e8e0d5;">' + Math.round(earnings) + ' ₽</td>';
+                tableHtml += '<td style="padding:10px; border:1px solid #e8e0d5;">' + escapeHtml(item.address || '-') + '</td>';
+                tableHtml += '</tr>';
+            }
+            
+            tableHtml += '</tbody></table>';
+            
+            document.getElementById('hoursDetailsTable').innerHTML = tableHtml;
+            document.getElementById('totalSalaryDisplay').innerHTML = '<strong>💰 Итого: ' + Math.round(totalEarnings) + ' ₽ (' + totalHours + ' часов)</strong>';
+            document.getElementById('hoursDetails').style.display = 'block';
+            
+            // Краткий результат
+            const tax = Math.round(totalEarnings * 0.13);
+            const netEarnings = totalEarnings - tax;
+            
+            document.getElementById('salaryPeriodDisplay').innerHTML = new Date(startDate).toLocaleDateString() + ' - ' + new Date(endDate).toLocaleDateString();
+            document.getElementById('displayTotalHours').innerHTML = totalHours + ' ч';
+            document.getElementById('displayHourlyRate').innerHTML = (data[0]?.hourly_rate || 500).toLocaleString() + ' ₽/час';
+            document.getElementById('displayTotalEarnings').innerHTML = Math.round(netEarnings).toLocaleString() + ' ₽';
+            document.getElementById('salaryResult').style.display = 'block';
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+            
+            currentPayslipData = { 
+                startDate: startDate,
+                endDate: endDate,
+                details: data,
+                totalHours: totalHours,
+                totalEarnings: totalEarnings,
+                hourlyRate: data[0]?.hourly_rate || 500,
+                userName: user.name
+            };
+            
+        } catch(e) {
+            console.error(e);
+            alert('Ошибка расчёта: ' + e.message);
+        } finally {
+            calcBtn.disabled = false;
+            calcBtn.textContent = '📊 Рассчитать';
+        }
+    }
+    
+    async function downloadPayslip() {
+        if (!currentPayslipData) {
+            alert('Сначала рассчитайте зарплату');
+            return;
+        }
+        
+        const data = currentPayslipData;
+        const tax = Math.round(data.totalEarnings * 0.13);
+        const netEarnings = data.totalEarnings - tax;
+        
+        let tableRows = '';
+        for (const item of data.details) {
+            let dateStr = '';
+            if (item.shift_date) {
+                const date = new Date(item.shift_date);
+                dateStr = date.toLocaleDateString('ru-RU');
+            }
+            const hours = parseFloat(item.actual_hours) || 0;
+            const earnings = parseFloat(item.earnings) || 0;
+            tableRows += `
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${dateStr}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${hours}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${item.hourly_rate} ₽</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">${Math.round(earnings)} ₽</td>
+                </tr>
+            `;
+        }
+        
+        const html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Расчётный лист - ${escapeHtml(data.userName)}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Inter', sans-serif; padding: 40px; max-width: 1000px; margin: 0 auto; background: #fff; }
+                h1 { color: #5D4A36; text-align: center; font-size: 1.8rem; margin-bottom: 10px; }
+                .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e8e0d5; padding-bottom: 15px; }
+                .company { font-weight: 600; font-size: 1.1rem; color: #333; }
+                .period { color: #666; margin-top: 5px; }
+                .info { background: #f8f5f0; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; }
+                .info p { margin: 5px 0; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th { background: #5D4A36; color: white; font-weight: 600; padding: 12px; border: 1px solid #e8e0d5; text-align: center; }
+                td { padding: 10px; border: 1px solid #ddd; }
+                .summary { text-align: right; padding: 15px 0; border-top: 2px solid #e8e0d5; margin-top: 20px; }
+                .summary p { margin: 5px 0; }
+                .total-hours { font-weight: 600; }
+                .total-earnings { font-weight: 700; font-size: 1.1rem; color: #5D4A36; }
+                .tax { color: #f44336; }
+                .net { font-size: 1.2rem; font-weight: 700; color: #4CAF50; }
+                .footer { text-align: center; margin-top: 40px; color: #999; font-size: 0.8rem; padding-top: 20px; border-top: 1px solid #e8e0d5; }
+                .signature { margin-top: 40px; display: flex; justify-content: space-between; }
+            </style>
+        </head>
+        <body>
+            <h1>Расчётный лист</h1>
+            <div class="header">
+                <div class="company">ООО "Чистый дом"</div>
+                <div class="period">Период: ${new Date(data.startDate).toLocaleDateString('ru-RU')} - ${new Date(data.endDate).toLocaleDateString('ru-RU')}</div>
+            </div>
+            
+            <div class="info">
+                <p><strong>Сотрудник:</strong> ${escapeHtml(data.userName)}</p>
+                <p><strong>Должность:</strong> Уборщик</p>
+                <p><strong>Ставка:</strong> ${data.hourlyRate.toLocaleString()} ₽/час</p>
+            </div>
+            
+            <h3>📋 Детализация по часам</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Часы</th>
+                        <th>Ставка</th>
+                        <th>Заработок</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+            
+            <div class="summary">
+                <p class="total-hours">📊 Итого часов: ${data.totalHours}</p>
+                <p class="total-earnings">💰 Начислено: ${Math.round(data.totalEarnings).toLocaleString()} ₽</p>
+                <p class="tax">📉 НДФЛ (13%): ${tax.toLocaleString()} ₽</p>
+                <p class="net">💵 Итого к выплате: ${Math.round(netEarnings).toLocaleString()} ₽</p>
+            </div>
+            
+            <div class="footer">
+                <p>Расчётный лист сформирован автоматически</p>
+                <p>Дата формирования: ${new Date().toLocaleDateString('ru-RU')}</p>
+            </div>
+            
+            <div class="signature">
+                <p>_________________________</p>
+                <p>_________________________</p>
+                <p>М.П.</p>
+            </div>
+        </body>
+        </html>`;
+        
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `payslip_${data.userName}_${data.startDate}_${data.endDate}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    function logout() { 
+        localStorage.removeItem('user'); 
+        window.location.href = 'index.html'; 
+    }
+    
+    loadStats();
+    loadShifts();
+    loadReviews();
+    
+    const burger = document.getElementById('burgerMenu');
+    const menu = document.getElementById('navMenu');
+    if (burger && menu) {
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            menu.classList.toggle('active');
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!-- components/navbar.html -->
+<nav class="navbar">
+    <div class="container nav-container">
+        <div class="burger-menu" id="burgerMenu">
+            <span></span><span></span><span></span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Главная</a></li>
+            <li><a href="index.html#services" class="nav-link">Услуги</a></li>
+            <li><a href="prices.html" class="nav-link">Цены</a></li>
+            <li><a href="schedule.html" class="nav-link">Расписание</a></li>
+            <li><a href="index.html#reviews" class="nav-link">Отзывы</a></li>
+            <li><a href="index.html#footer" class="nav-link">Контакты</a></li>
+            <li class="dropdown">
+                <a href="#" class="nav-link" id="employeesLink">Работникам ▼</a>
+                <ul class="dropdown-menu">
+                    <li><a href="schedule.html" class="nav-link">📅 Расписание</a></li>
+                    <li><a href="#" class="nav-link" id="workerLoginBtn">🔐 Личный кабинет</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<style>
+.dropdown { position: relative; }
+.dropdown-menu { 
+    display: none; 
+    position: absolute; 
+    top: 100%; 
+    left: 0; 
+    background: #1a1a1a; 
+    border-radius: 12px; 
+    padding: 10px 0; 
+    min-width: 220px; 
+    z-index: 100; 
+}
+.dropdown:hover .dropdown-menu { display: block; }
+.dropdown-menu li { 
+    list-style: none; 
+    padding: 10px 20px; 
+}
+.dropdown-menu li:hover { 
+    background: #333; 
+    border-radius: 8px; 
+}
+.dropdown-menu a { 
+    color: white; 
+    text-decoration: none; 
+    display: block; 
+}
+@media (max-width: 768px) {
+    .dropdown-menu { 
+        position: static; 
+        display: none; 
+        background: #2a2a2a; 
+        margin-left: 20px; 
+    }
+    .dropdown.active .dropdown-menu { display: block; }
+}
+</style>

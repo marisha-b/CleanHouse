@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заявки | Чистый дом</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .order-page { padding-top: 100px; padding-bottom: 80px; background: linear-gradient(135deg, #f8f9fa 0%, #f0e9e0 100%); min-height: 100vh; }
+        .order-header { text-align: center; margin-bottom: 50px; }
+        .order-header h1 { font-size: 3rem; color: #2c2c2c; margin-bottom: 1rem; position: relative; display: inline-block; }
+        .order-header h1::after { content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 120px; height: 4px; background: #8B7355; border-radius: 2px; }
+        .order-header p { font-size: 1.2rem; color: #666; max-width: 800px; margin: 30px auto 0; }
+        .order-form-container { max-width: 900px; margin: 0 auto; background: #ffffff; border-radius: 40px; padding: 50px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1); }
+        .section-title { font-size: 1.8rem; color: #5D4A36; margin: 30px 0 25px 0; padding-bottom: 12px; border-bottom: 2px solid #e8e0d5; display: flex; align-items: center; gap: 12px; }
+        .section-title:first-of-type { margin-top: 0; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-size: 0.95rem; font-weight: 500; color: #3a3a3a; margin-bottom: 8px; }
+        .form-group label .required { color: #cc0000; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 14px 18px; border: 2px solid #e8e0d5; border-radius: 16px; font-size: 1rem; font-family: 'Inter', sans-serif; background: #fefcf9; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #8B7355; }
+        .row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .selected-services-list { background: #f8f5f0; border-radius: 20px; padding: 20px; margin: 20px 0; }
+        .selected-service-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e8e0d5; }
+        .selected-service-item:last-child { border-bottom: none; }
+        .total-block { background: linear-gradient(135deg, #5D4A36, #8B7355); border-radius: 20px; padding: 20px 30px; margin: 30px 0; text-align: center; color: white; }
+        .total-block .price { font-size: 2.5rem; font-weight: 700; margin-left: 20px; color: #FFE74A; }
+        .submit-btn { width: 100%; background: #5D4A36; color: white; border: none; padding: 18px; font-size: 1.2rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s; margin-top: 30px; }
+        .submit-btn:hover { background: #8B7355; transform: translateY(-2px); }
+        .search-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-input { flex: 1; padding: 12px 16px; border: 2px solid #e8e0d5; border-radius: 30px; font-size: 1rem; }
+        .search-btn { padding: 12px 24px; background: #5D4A36; color: white; border: none; border-radius: 30px; cursor: pointer; }
+        #map { height: 300px; border-radius: 20px; margin-bottom: 20px; z-index: 1; }
+        
+        /* Стили для модального окна оплаты */
+        .payment-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; }
+        .payment-modal.active { display: flex; }
+        .payment-modal-content { background: white; border-radius: 30px; padding: 35px; width: 90%; max-width: 450px; }
+        .payment-modal-content h3 { color: #5D4A36; margin-bottom: 20px; text-align: center; }
+        .payment-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e8e0d5; border-radius: 12px; font-size: 1rem; }
+        .payment-row { display: flex; gap: 15px; }
+        .payment-row .form-group { flex: 1; }
+        .btn-pay { width: 100%; background: #4CAF50; color: white; border: none; padding: 14px; border-radius: 30px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-pay:hover { background: #45a049; }
+        .btn-cancel-pay { background: #999; width: 100%; margin-top: 10px; }
+        
+        @media (max-width: 768px) {
+            .order-page { padding-top: 80px; }
+            .order-header h1 { font-size: 2rem; }
+            .order-form-container { padding: 30px 20px; }
+            .row-two { grid-template-columns: 1fr; }
+            .total-block .price { font-size: 1.8rem; display: block; margin-left: 0; margin-top: 10px; }
+            .payment-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+<div id="modal-placeholder"></div>
+<div id="client-modal-placeholder"></div>
+
+<div class="order-page">
+    <div class="container">
+        <div class="order-header">
+            <h1>Оформление заявки</h1>
+            <p>Заполните форму, и наш менеджер свяжется с вами для подтверждения</p>
+        </div>
+        
+        <div class="order-form-container">
+            <div class="section-title"><span>🧹</span> Выбранные услуги</div>
+            <div id="selectedServicesList" class="selected-services-list"></div>
+            
+            <div class="total-block">
+                <span>Итого к оплате:</span>
+                <span class="price" id="totalPrice">0 ₽</span>
+            </div>
+            
+            <div class="section-title"><span>👤</span> Контактные данные</div>
+            <div class="row-two">
+                <div class="form-group">
+                    <label>Ваше имя <span class="required">*</span></label>
+                    <input type="text" id="clientName" placeholder="Иван Иванов">
+                </div>
+                <div class="form-group">
+                    <label>Телефон <span class="required">*</span></label>
+                    <input type="tel" id="clientPhone" placeholder="+7 (___) ___-__-__">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="clientEmail" placeholder="ivan@example.com">
+            </div>
+            
+            <div class="section-title"><span>📅</span> Дата и время</div>
+            <div class="row-two">
+                <div class="form-group">
+                    <label>Дата <span class="required">*</span></label>
+                    <input type="date" id="orderDate">
+                </div>
+                <div class="form-group">
+                    <label>Время <span class="required">*</span></label>
+                    <select id="orderTime">
+                        <option value="09:00">09:00 - 10:00</option>
+                        <option value="10:00">10:00 - 11:00</option>
+                        <option value="11:00">11:00 - 12:00</option>
+                        <option value="12:00">12:00 - 13:00</option>
+                        <option value="13:00">13:00 - 14:00</option>
+                        <option value="14:00">14:00 - 15:00</option>
+                        <option value="15:00">15:00 - 16:00</option>
+                        <option value="16:00">16:00 - 17:00</option>
+                        <option value="17:00">17:00 - 18:00</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="section-title"><span>📍</span> Адрес уборки</div>
+            <div class="search-container">
+                <input type="text" id="addressSearch" class="search-input" placeholder="Введите адрес (например: Иркутск, Ленина 1)">
+                <button class="search-btn" id="searchAddressBtn">🔍 Найти на карте</button>
+            </div>
+            <div id="map"></div>
+            <div class="address-hint">💡 Введите адрес и нажмите "Найти на карте" — карта покажет точное местоположение.</div>
+            
+            <div class="section-title"><span>💳</span> Способ оплаты</div>
+            <div class="form-group">
+                <select id="paymentMethod" class="payment-select">
+                    <option value="cash">💰 Наличными курьеру</option>
+                    <option value="card_courier">💳 Картой курьеру</option>
+                    <option value="card_online">🏦 Онлайн картой</option>
+                </select>
+            </div>
+            
+            <div class="section-title"><span>💬</span> Особые пожелания</div>
+            <div class="form-group">
+                <textarea id="comment" rows="4" placeholder="Укажите особые пожелания (например, гипоаллергенная химия, осторожно с антикварной мебелью и т.д.)"></textarea>
+            </div>
+            
+            <button class="submit-btn" id="submitBtn">Отправить заявку</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для онлайн оплаты -->
+<div id="paymentModal" class="payment-modal">
+    <div class="payment-modal-content">
+        <h3>💳 Оплата заказа</h3>
+        <div class="form-group">
+            <label>Номер карты</label>
+            <input type="text" id="cardNumber" class="payment-input" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+        <div class="form-group">
+            <label>Владелец карты</label>
+            <input type="text" id="cardHolder" class="payment-input" placeholder="IVAN IVANOV">
+        </div>
+        <div class="payment-row">
+            <div class="form-group">
+                <label>Срок действия</label>
+                <input type="text" id="expiryDate" class="payment-input" placeholder="MM/YY" maxlength="5">
+            </div>
+            <div class="form-group">
+                <label>CVV</label>
+                <input type="password" id="cvv" class="payment-input" placeholder="123" maxlength="3">
+            </div>
+        </div>
+        <div class="total-block" style="margin: 15px 0; padding: 15px;">
+            <span>Сумма к оплате:</span>
+            <span class="price" id="paymentAmount" style="font-size: 1.5rem;">0 ₽</span>
+        </div>
+        <button class="btn-pay" id="confirmPayBtn">💳 Оплатить</button>
+        <button class="btn-pay btn-cancel-pay" onclick="closePaymentModal()">Отмена</button>
+        <div id="paymentError" style="color: red; text-align: center; margin-top: 15px; display: none;"></div>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="components/loader.js"></script>
+<script src="script.js"></script>
+<script>
+    let selectedServices = [];
+    let totalPrice = 0;
+    let map, marker;
+    const irkutsk = [52.286387, 104.280663];
+    let currentOrderId = null;
+    
+    function loadSelectedServices() {
+        const savedServices = localStorage.getItem('selectedServices');
+        const savedTotal = localStorage.getItem('totalPrice');
+        
+        if (savedServices) {
+            selectedServices = JSON.parse(savedServices);
+            totalPrice = parseInt(savedTotal) || 0;
+            renderSelectedServices();
+            document.getElementById('totalPrice').textContent = totalPrice + ' ₽';
+        } else {
+            window.location.href = 'prices.html';
+        }
+    }
+    
+    function renderSelectedServices() {
+        const container = document.getElementById('selectedServicesList');
+        if (selectedServices.length === 0) {
+            container.innerHTML = '<p style="padding: 20px; text-align: center;">Нет выбранных услуг. <a href="prices.html">Выберите услуги</a></p>';
+            return;
+        }
+        
+        container.innerHTML = selectedServices.map(service => `
+            <div class="selected-service-item">
+                <span>${escapeHtml(service.name)}</span>
+                <span style="font-weight: 600;">${service.price} ₽</span>
+            </div>
+        `).join('');
+    }
+    
+    function loadClientData() {
+        const client = localStorage.getItem('client');
+        if (client) {
+            const clientData = JSON.parse(client);
+            const clientName = clientData.name || clientData.full_name || '';
+            document.getElementById('clientName').value = clientName;
+            document.getElementById('clientPhone').value = clientData.phone || '';
+            document.getElementById('clientEmail').value = clientData.email || '';
+        }
+    }
+    
+    function showPaymentModal(orderId, amount) {
+        currentOrderId = orderId;
+        document.getElementById('paymentAmount').textContent = amount + ' ₽';
+        document.getElementById('cardNumber').value = '';
+        document.getElementById('cardHolder').value = '';
+        document.getElementById('expiryDate').value = '';
+        document.getElementById('cvv').value = '';
+        document.getElementById('paymentError').style.display = 'none';
+        document.getElementById('paymentModal').classList.add('active');
+    }
+    
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.remove('active');
+    }
+    
+    async function processPayment() {
+        const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+        const cardHolder = document.getElementById('cardHolder').value;
+        const expiryDate = document.getElementById('expiryDate').value;
+        const cvv = document.getElementById('cvv').value;
+        const errorDiv = document.getElementById('paymentError');
+        
+        if (!cardNumber || cardNumber.length !== 16) {
+            errorDiv.textContent = 'Введите корректный номер карты (16 цифр)';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        if (!cardHolder) {
+            errorDiv.textContent = 'Введите имя владельца карты';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        if (!expiryDate || expiryDate.length !== 5) {
+            errorDiv.textContent = 'Введите срок действия (ММ/ГГ)';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        if (!cvv || cvv.length !== 3) {
+            errorDiv.textContent = 'Введите CVV код (3 цифры)';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        try {
+            const res = await fetch('/api/payments/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    order_id: currentOrderId,
+                    amount: totalPrice,
+                    payment_method: 'card_online',
+                    card_number: cardNumber,
+                    card_holder: cardHolder,
+                    expiry_date: expiryDate,
+                    cvv: cvv
+                })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok && data.success) {
+                alert('✅ Оплата прошла успешно! Заказ оформлен.');
+                closePaymentModal();
+                localStorage.removeItem('selectedServices');
+                localStorage.removeItem('totalPrice');
+                window.location.href = 'client-cabinet.html';
+            } else {
+                errorDiv.textContent = data.error || 'Ошибка оплаты';
+                errorDiv.style.display = 'block';
+            }
+        } catch(e) {
+            errorDiv.textContent = 'Ошибка соединения';
+            errorDiv.style.display = 'block';
+        }
+    }
+    
+    async function submitOrder() {
+        const client = localStorage.getItem('client');
+        if (!client) {
+            alert('Пожалуйста, войдите в аккаунт');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        const clientData = JSON.parse(client);
+        const name = document.getElementById('clientName').value.trim();
+        const phone = document.getElementById('clientPhone').value.trim();
+        const email = document.getElementById('clientEmail').value.trim();
+        const date = document.getElementById('orderDate').value;
+        const time = document.getElementById('orderTime').value;
+        const address = document.getElementById('addressSearch').value.trim();
+        const comment = document.getElementById('comment').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        
+        if (!name) { alert('Введите ваше имя'); return; }
+        if (!phone) { alert('Введите телефон'); return; }
+        if (!date) { alert('Выберите дату'); return; }
+        if (!address) { alert('Введите адрес'); return; }
+        if (selectedServices.length === 0) { alert('Выберите услуги'); return; }
+        
+        const orderData = {
+            client_id: clientData.id,
+            client_name: name,
+            client_phone: phone,
+            client_email: email,
+            address: address,
+            order_date: date,
+            time_slot: time,
+            comment: comment,
+            services: selectedServices,
+            total_price: totalPrice,
+            payment_method: paymentMethod
+        };
+        
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                if (paymentMethod === 'card_online') {
+                    showPaymentModal(result.order_id, totalPrice);
+                } else {
+                    alert('✅ Заказ успешно оформлен!');
+                    localStorage.removeItem('selectedServices');
+                    localStorage.removeItem('totalPrice');
+                    window.location.href = 'client-cabinet.html';
+                }
+            } else {
+                alert('Ошибка: ' + (result.error || 'Попробуйте позже'));
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка соединения с сервером');
+        }
+    }
+    
+    function initMap() {
+        map = L.map('map').setView(irkutsk, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        marker = L.marker(irkutsk).addTo(map);
+        
+        map.on('click', async function(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+            marker.setLatLng([lat, lng]);
+            
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
+                const data = await response.json();
+                document.getElementById('addressSearch').value = data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            } catch(error) {
+                document.getElementById('addressSearch').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+        });
+    }
+    
+    async function searchAddress() {
+        const query = document.getElementById('addressSearch').value.trim();
+        if (!query) { alert('Введите адрес'); return; }
+        
+        const btn = document.getElementById('searchAddressBtn');
+        btn.textContent = '⏳ Поиск...';
+        btn.disabled = true;
+        
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                map.setView([lat, lon], 16);
+                marker.setLatLng([lat, lon]);
+                document.getElementById('addressSearch').value = data[0].display_name;
+            } else {
+                alert('Адрес не найден');
+            }
+        } catch(error) {
+            alert('Ошибка поиска');
+        } finally {
+            btn.textContent = '🔍 Найти на карте';
+            btn.disabled = false;
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Форматирование номера карты
+    document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\s/g, '');
+        if (value.length > 16) value = value.slice(0, 16);
+        let formatted = '';
+        for (let i = 0; i < value.length; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += value[i];
+        }
+        e.target.value = formatted;
+    });
+    
+    // Форматирование срока действия
+    document.getElementById('expiryDate')?.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        if (value.length >= 3) {
+            value = value.slice(0, 2) + '/' + value.slice(2);
+        }
+        e.target.value = value;
+    });
+    
+    document.getElementById('orderDate').min = new Date().toISOString().split('T')[0];
+    document.getElementById('submitBtn').addEventListener('click', submitOrder);
+    document.getElementById('searchAddressBtn').addEventListener('click', searchAddress);
+    document.getElementById('confirmPayBtn')?.addEventListener('click', processPayment);
+    document.getElementById('addressSearch')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchAddress();
+    });
+    
+    loadSelectedServices();
+    loadClientData();
+    initMap();
+</script>
+</body>
+</html>

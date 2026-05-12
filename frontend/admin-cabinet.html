@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель | Чистый дом</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f8f9fa 0%, #f0e9e0 100%); min-height: 100vh; }
+        
+        .navbar { background: #1a1a1a; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 15px 20px; }
+        .nav-menu { display: flex; list-style: none; gap: 25px; }
+        .nav-link { color: white; text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: #FFE74A; }
+        .burger-menu { display: none; flex-direction: column; cursor: pointer; }
+        .burger-menu span { width: 25px; height: 3px; background: white; margin: 3px 0; transition: 0.3s; }
+        
+        .admin-cabinet { max-width: 1400px; margin: 100px auto 40px; padding: 0 20px; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-bottom: 50px; }
+        .stat-card { background: white; border-radius: 24px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; transition: all 0.3s ease; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(93,74,54,0.15); }
+        .stat-value { font-size: 2.5rem; font-weight: 700; color: #5D4A36; transition: color 0.3s; }
+        .stat-card:hover .stat-value { color: #8B7355; }
+        .stat-label { color: #666; margin-top: 10px; }
+        .stat-hint { font-size: 0.7rem; color: #8B7355; margin-top: 8px; }
+        
+        .tabs { display: flex; gap: 15px; border-bottom: 2px solid #e8e0d5; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 25px; background: none; border: none; font-size: 1rem; cursor: pointer; color: #666; border-radius: 30px 30px 0 0; transition: all 0.3s; }
+        .tab-btn:hover { background: #f8f5f0; color: #5D4A36; transform: translateY(-2px); }
+        .tab-btn.active { color: #5D4A36; border-bottom: 3px solid #5D4A36; font-weight: 600; }
+        .tab-panel { display: none; animation: fadeIn 0.3s; }
+        .tab-panel.active { display: block; }
+        
+        .services-table, .employees-table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; margin-top: 15px; }
+        .services-table th, .services-table td, .employees-table th, .employees-table td { border: 1px solid #e8e0d5; padding: 12px; text-align: left; }
+        .services-table th, .employees-table th { background: #5D4A36; color: white; }
+        .services-table tr:hover, .employees-table tr:hover { background: #f8f5f0; }
+        
+        .btn-add { background: #5D4A36; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .btn-add:hover { background: #8B7355; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(93,74,54,0.3); }
+        .btn-edit { background: #2196F3; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; margin-right: 5px; transition: all 0.3s; }
+        .btn-edit:hover { background: #1976D2; transform: scale(1.05); }
+        .btn-delete { background: #f44336; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; transition: all 0.3s; }
+        .btn-delete:hover { background: #d32f2f; transform: scale(1.05); }
+        .btn-reply { background: #4CAF50; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; margin-right: 5px; transition: all 0.3s; }
+        .btn-reply:hover { background: #45a049; transform: scale(1.05); }
+        .btn-cache { background: #8B7355; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .btn-cache:hover { background: #5D4A36; transform: translateY(-2px); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 30px; padding: 30px; width: 90%; max-width: 500px; animation: modalFadeIn 0.3s; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; transition: border 0.3s; }
+        .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { outline: none; border-color: #5D4A36; }
+        .btn-save { background: #5D4A36; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .btn-save:hover { background: #8B7355; transform: translateY(-2px); }
+        .btn-cancel { background: #999; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; margin-left: 10px; transition: all 0.3s; }
+        .btn-cancel:hover { background: #777; transform: translateY(-2px); }
+        
+        .chart-container { background: white; border-radius: 24px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.3s; }
+        .chart-container:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(93,74,54,0.1); }
+        .chart-container h3 { margin-bottom: 20px; color: #5D4A36; }
+        canvas { max-height: 300px; }
+        
+        .rating-distribution { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
+        .rating-bar-item { flex: 1; min-width: 150px; }
+        .rating-label { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .rating-bar-bg { background: #e8e0d5; border-radius: 10px; height: 30px; overflow: hidden; }
+        .rating-bar-fill { background: #8B7355; height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-size: 0.8rem; transition: width 0.5s ease; }
+        
+        .employee-rating-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e8e0d5; transition: background 0.3s; }
+        .employee-rating-item:hover { background: #f8f5f0; }
+        .employee-rating-stars { color: #FFD700; font-size: 1.1rem; }
+        
+        .review-item { background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #e8e0d5; transition: all 0.3s; }
+        .review-item:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .review-stars { color: #FFD700; font-size: 1.2rem; }
+        .review-date { color: #999; font-size: 0.85rem; }
+        .review-comment { margin: 10px 0; line-height: 1.5; color: #333; }
+        .review-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .review-answer { background: #f8f5f0; border-radius: 12px; padding: 12px; margin-top: 12px; border-left: 3px solid #5D4A36; }
+        .review-answer strong { color: #5D4A36; }
+        
+        .employee-rating-chart { background: white; border-radius: 24px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .rating-chart-item { margin-bottom: 20px; }
+        .rating-chart-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .rating-chart-bar { background: #e8e0d5; border-radius: 10px; height: 40px; overflow: hidden; }
+        .rating-chart-fill { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: 600; border-radius: 10px; transition: width 0.5s ease; }
+        
+        .shifts-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+        .shifts-modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            max-width: 95%;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .shifts-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .shifts-modal-header h2 {
+            color: #5D4A36;
+            margin: 0;
+        }
+        .shifts-modal-close {
+            font-size: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+        }
+        .shifts-modal-close:hover { color: #333; }
+        .shifts-schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .shifts-schedule-table th, .shifts-schedule-table td {
+            border: 1px solid #e8e0d5;
+            padding: 10px;
+            text-align: center;
+        }
+        .shifts-schedule-table th {
+            background: #5D4A36;
+            color: white;
+            font-weight: 500;
+        }
+        .shifts-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e8e0d5;
+        }
+        .shift-card-small {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #f5f0e8;
+            border-radius: 8px;
+            border-left: 4px solid #8B7355;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 30px 0 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .finance-card { background: white; border-radius: 24px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .finance-card h3 { color: #5D4A36; margin-bottom: 20px; }
+        .finance-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .finance-stat { text-align: center; padding: 20px; background: #f8f5f0; border-radius: 20px; }
+        .finance-stat .value { font-size: 2rem; font-weight: 700; color: #5D4A36; }
+        .finance-stat .label { color: #666; margin-top: 5px; }
+        .profit-value { color: #4CAF50 !important; }
+        .expense-value { color: #f44336 !important; }
+        .month-selector { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .month-selector select, .month-selector input { padding: 8px 15px; border: 1px solid #ddd; border-radius: 10px; }
+        .rate-list { margin-top: 15px; }
+        .rate-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e8e0d5; }
+        .rate-item:last-child { border-bottom: none; }
+        .rate-edit { display: flex; gap: 10px; align-items: center; }
+        .rate-edit input { width: 100px; padding: 5px 10px; border: 1px solid #ddd; border-radius: 8px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .services-table, .employees-table { font-size: 0.8rem; }
+            .chart-container { padding: 15px; }
+            .burger-menu { display: flex; }
+            .nav-menu { display: none; position: fixed; top: 0; left: -100%; width: 80%; height: 100vh; background: #1a1a1a; flex-direction: column; padding: 70px 20px; gap: 0; }
+            .nav-menu.active { left: 0; display: flex; }
+            .shifts-modal-content { padding: 15px; }
+            .shifts-schedule-table th, .shifts-schedule-table td { padding: 5px; font-size: 0.7rem; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .finance-stats { grid-template-columns: 1fr; }
+            .month-selector { flex-direction: column; align-items: stretch; }
+            .rate-item { flex-direction: column; gap: 10px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+
+<div class="admin-cabinet">
+    <div class="admin-header">
+        <h1>👑 Админ-панель</h1>
+        <div>
+            <button class="btn-cache" onclick="clearCache()">🗑️ Очистить кэш</button>
+            <button class="btn-add" onclick="logout()" style="background: #cc0000;">Выйти</button>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="workersCount">-</div>
+            <div class="stat-label">👥 Сотрудников</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="avgRating">-</div>
+            <div class="stat-label">⭐ Средний рейтинг</div>
+        </div>
+        <div class="stat-card" id="shiftsCard" style="cursor: pointer;">
+            <div class="stat-value" id="weeklyShifts">-</div>
+            <div class="stat-label">📅 Смен на неделе</div>
+            <div class="stat-hint">👆 Нажмите для просмотра</div>
+        </div>
+        <div class="stat-card" id="revenueCard" style="cursor: pointer;">
+            <div class="stat-value" id="monthRevenue">-</div>
+            <div class="stat-label">💰 Выручка за месяц</div>
+            <div class="stat-hint">👆 Нажмите для деталей</div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="analytics">📊 Аналитика</button>
+        <button class="tab-btn" data-tab="services">🧹 Услуги</button>
+        <button class="tab-btn" data-tab="employees">👥 Сотрудники</button>
+        <button class="tab-btn" data-tab="ratings">⭐ Рейтинг и отзывы</button>
+        <button class="tab-btn" data-tab="finance">💰 Финансы</button>
+    </div>
+    
+    <!-- Аналитика -->
+    <div id="analyticsPanel" class="tab-panel active">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div class="chart-container">
+                <h3>⭐ Рейтинг сотрудников</h3>
+                <div id="workersRating">Загрузка...</div>
+            </div>
+            <div class="chart-container">
+                <h3>📊 Популярность услуг</h3>
+                <canvas id="popularServicesChart"></canvas>
+                <div id="popularServices" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+        
+        <!-- График распределения оценок -->
+        <div class="chart-container">
+            <h3>⭐ Распределение оценок в отзывах</h3>
+            <canvas id="reviewsRatingChart" style="max-height: 300px;"></canvas>
+            <div id="reviewsDistribution" style="margin-top: 20px;"></div>
+        </div>
+        
+        <!-- Новый график: Динамика заказов по месяцам -->
+        <div class="chart-container">
+            <h3>📈 Динамика количества заказов по месяцам</h3>
+            <canvas id="ordersByMonthChart" style="max-height: 300px;"></canvas>
+        </div>
+        
+        <!-- Новый график: Выручка по месяцам -->
+        <div class="chart-container">
+            <h3>💰 Динамика выручки по месяцам</h3>
+            <canvas id="revenueByMonthChart" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+    
+    <!-- Управление услугами -->
+    <div id="servicesPanel" class="tab-panel">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <button class="btn-add" id="addServiceBtn">+ Добавить услугу</button>
+        </div>
+        <table class="services-table">
+            <thead>
+                <tr><th>ID</th><th>Название</th><th>Категория</th><th>Цена</th><th>Действия</th></tr>
+            </thead>
+            <tbody id="servicesTableBody"></tbody>
+        </table>
+    </div>
+    
+    <!-- Сотрудники -->
+    <div id="employeesPanel" class="tab-panel">
+        <div class="employee-rating-chart">
+            <div id="employeesRatingChart"></div>
+        </div>
+        
+        <div class="section-header">
+            <button class="btn-add" id="addEmployeeBtn">+ Добавить сотрудника</button>
+            <h3 style="color: #5D4A36; margin: 0;">📋 Список сотрудников</h3>
+        </div>
+        
+        <table class="employees-table">
+            <thead>
+                <tr><th>ID</th><th>Имя</th><th>Телефон</th><th>Роль</th><th>Ставка</th><th>Действия</th></tr>
+            </thead>
+            <tbody id="employeesTableBody"></tbody>
+        </table>
+    </div>
+    
+    <!-- Рейтинг и отзывы -->
+    <div id="ratingsPanel" class="tab-panel">
+        <div class="chart-container">
+            <h3>📈 Динамика отзывов за последние 30 дней</h3>
+            <canvas id="reviewsTrendChart"></canvas>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+            <h3 style="color: #5D4A36;">💬 Все отзывы</h3>
+            <button class="btn-add" onclick="loadAllReviews()" style="background: #8B7355;">🔄 Обновить</button>
+        </div>
+        <div id="allReviewsList">Загрузка отзывов...</div>
+    </div>
+    
+    <!-- Финансы -->
+    <div id="financePanel" class="tab-panel">
+        <div class="finance-card">
+            <div class="month-selector">
+                <select id="financeMonth">
+                    <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
+                    <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
+                    <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
+                    <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
+                </select>
+                <input type="number" id="financeYear" value="2026">
+                <button class="btn-add" onclick="loadFinanceData()" style="background: #8B7355;">📊 Рассчитать</button>
+            </div>
+            
+            <div class="finance-stats">
+                <div class="finance-stat"><div class="value" id="financeRevenue">0 ₽</div><div class="label">💰 Выручка</div></div>
+                <div class="finance-stat"><div class="value expense-value" id="financeExpenses">0 ₽</div><div class="label">📉 Расходы</div></div>
+                <div class="finance-stat"><div class="value profit-value" id="financeProfit">0 ₽</div><div class="label">📈 Чистая прибыль</div></div>
+            </div>
+            
+            <div id="expensesDetails" style="margin-top: 15px; padding: 15px; background: #f8f5f0; border-radius: 12px;"></div>
+        </div>
+        
+        <div class="finance-card">
+            <h3>💰 Ставки сотрудников</h3>
+            <div id="workersRatesList">Загрузка...</div>
+        </div>
+        
+        <div class="finance-card">
+            <h3>📋 Зарплаты менеджеров</h3>
+            <div id="managersSalaryList">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна -->
+<div id="serviceModal" class="modal"><div class="modal-content"><h3 id="serviceModalTitle">Добавить услугу</h3><input type="hidden" id="serviceId"><input type="text" id="serviceName" placeholder="Название услуги"><textarea id="serviceDescription" rows="3" placeholder="Описание услуги"></textarea><select id="serviceCategory"><option value="apartment">Уборка квартир</option><option value="house">Уборка домов</option><option value="office">Уборка офисов</option><option value="additional">Дополнительные услуги</option></select><select id="servicePriceType"><option value="rooms">За комнату</option><option value="area">За площадь</option><option value="fixed">Фиксированная</option></select><input type="number" id="serviceBasePrice" placeholder="Базовая цена"><input type="number" id="servicePricePerUnit" placeholder="Цена за единицу"><div><button class="btn-save" onclick="saveService()">Сохранить</button><button class="btn-cancel" onclick="closeServiceModal()">Отмена</button></div></div></div>
+
+<div id="employeeModal" class="modal"><div class="modal-content"><h3 id="employeeModalTitle">Добавить сотрудника</h3><input type="hidden" id="employeeId"><input type="text" id="employeeName" placeholder="ФИО сотрудника"><input type="tel" id="employeePhone" placeholder="Телефон"><select id="employeeRole"><option value="worker">Сотрудник</option><option value="manager">Менеджер</option></select><input type="password" id="employeePassword" placeholder="Пароль"><div><button class="btn-save" onclick="saveEmployee()">Сохранить</button><button class="btn-cancel" onclick="closeEmployeeModal()">Отмена</button></div></div></div>
+
+<div id="replyModal" class="modal"><div class="modal-content"><h3>💬 Ответить на отзыв</h3><input type="hidden" id="replyReviewId"><textarea id="replyText" rows="4" placeholder="Введите ответ на отзыв..."></textarea><div><button class="btn-save" onclick="submitReply()">Отправить ответ</button><button class="btn-cancel" onclick="closeReplyModal()">Отмена</button></div></div></div>
+
+<div id="rateModal" class="modal"><div class="modal-content"><h3>✏️ Редактировать ставку</h3><input type="hidden" id="rateUserId"><input type="hidden" id="rateUserType"><label id="rateLabel">Ставка (₽/час)</label><input type="number" id="rateValue" step="100"><div><button class="btn-save" onclick="saveRate()">Сохранить</button><button class="btn-cancel" onclick="closeRateModal()">Отмена</button></div></div></div>
+
+<div id="footer-placeholder"></div>
+
+<script src="components/loader.js"></script>
+<script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || user.role !== 'admin') window.location.href = 'index.html';
+    
+    let popularServicesChart = null, reviewsRatingChart = null, reviewsTrendChart = null, ordersByMonthChart = null, revenueByMonthChart = null;
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab + 'Panel').classList.add('active');
+            if (btn.dataset.tab === 'ratings') { loadAllReviews(); loadReviewsTrend(); }
+            if (btn.dataset.tab === 'employees') loadEmployeesRatingChart();
+            if (btn.dataset.tab === 'analytics') { loadOrdersByMonthChart(); loadRevenueByMonthChart(); }
+            if (btn.dataset.tab === 'finance') { loadFinanceData(); loadWorkersRates(); loadManagersSalaries(); }
+        };
+    });
+    
+    async function clearCache() {
+        try { await fetch('/api/cache/clear', { method: 'POST' }); if (window.apiCache) window.apiCache.clear(); alert('✅ Кэш очищен'); location.reload(); } 
+        catch(e) { alert('Ошибка: ' + e.message); }
+    }
+    
+    // ========== ДИНАМИКА ЗАКАЗОВ ПО МЕСЯЦАМ ==========
+    async function loadOrdersByMonthChart() {
+        try {
+            const res = await fetch('/api/orders/all-orders');
+            const orders = await res.json();
+            
+            const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+            const ordersCount = new Array(12).fill(0);
+            const completedOrders = new Array(12).fill(0);
+            
+            orders.forEach(order => {
+                const date = new Date(order.created_at);
+                const month = date.getMonth();
+                ordersCount[month]++;
+                if (order.status === 'completed') completedOrders[month]++;
+            });
+            
+            if (ordersByMonthChart) ordersByMonthChart.destroy();
+            const ctx = document.getElementById('ordersByMonthChart').getContext('2d');
+            ordersByMonthChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        { label: 'Все заказы', data: ordersCount, backgroundColor: '#5D4A36', borderRadius: 8 },
+                        { label: 'Выполненные', data: completedOrders, backgroundColor: '#4CAF50', borderRadius: 8 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, stepSize: 1, title: { display: true, text: 'Количество заказов' } } } }
+            });
+        } catch(e) { console.error(e); }
+    }
+    
+    // ========== ВЫРУЧКА ПО МЕСЯЦАМ ==========
+    async function loadRevenueByMonthChart() {
+        try {
+            const revenueByMonth = new Array(12).fill(0);
+            
+            for (let month = 1; month <= 12; month++) {
+                const res = await fetch(`/api/salary/company/revenue?month=${month}&year=2026`);
+                const data = await res.json();
+                revenueByMonth[month - 1] = data.revenue || 0;
+            }
+            
+            const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сеп', 'Окт', 'Ноя', 'Дек'];
+            
+            if (revenueByMonthChart) revenueByMonthChart.destroy();
+            const ctx = document.getElementById('revenueByMonthChart').getContext('2d');
+            revenueByMonthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{ label: 'Выручка (₽)', data: revenueByMonth, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.1)', borderWidth: 3, fill: true, tension: 0.3 }]
+                },
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, title: { display: true, text: 'Сумма (₽)' } } } }
+            });
+        } catch(e) { console.error(e); }
+    }
+    
+    // ========== ФИНАНСЫ ==========
+    async function loadFinanceData() {
+        const month = document.getElementById('financeMonth').value;
+        const year = document.getElementById('financeYear').value;
+        try {
+            const res = await fetch(`/api/salary/company/revenue?month=${month}&year=${year}`);
+            const data = await res.json();
+            document.getElementById('financeRevenue').innerHTML = Math.round(data.revenue || 0).toLocaleString() + ' ₽';
+            document.getElementById('financeExpenses').innerHTML = Math.round(data.expenses || 0).toLocaleString() + ' ₽';
+            document.getElementById('financeProfit').innerHTML = Math.round(data.profit || 0).toLocaleString() + ' ₽';
+            document.getElementById('expensesDetails').innerHTML = `<p>👨‍🔧 Зарплаты сотрудников: ${Math.round(data.workers_salary || 0).toLocaleString()} ₽</p><p>📋 Зарплаты менеджеров: ${Math.round(data.managers_salary || 0).toLocaleString()} ₽</p>`;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadWorkersRates() {
+        try {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+            const workers = users.filter(u => u.role === 'worker');
+            let html = '<div class="rate-list">';
+            for (const w of workers) {
+                const rateRes = await fetch(`/api/salary/worker/${w.id}`);
+                const rateData = await rateRes.json();
+                html += `<div class="rate-item"><span><strong>${escapeHtml(w.full_name)}</strong></span><div class="rate-edit"><span>💰 ${rateData.hourly_rate || 500} ₽/час</span><button class="btn-edit" onclick="editRate(${w.id}, 'worker', ${rateData.hourly_rate || 500})">✏️</button></div></div>`;
+            }
+            html += '</div>';
+            document.getElementById('workersRatesList').innerHTML = html;
+        } catch(e) { document.getElementById('workersRatesList').innerHTML = '<p style="color:red;">Ошибка</p>'; }
+    }
+    
+    async function loadManagersSalaries() {
+        try {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+            const managers = users.filter(u => u.role === 'manager');
+            let html = '<div class="rate-list">';
+            for (const m of managers) {
+                const salaryRes = await fetch(`/api/salary/manager/${m.id}`);
+                const salaryData = await salaryRes.json();
+                html += `<div class="rate-item"><span><strong>${escapeHtml(m.full_name)}</strong></span><div class="rate-edit"><span>💰 ${salaryData.monthly_salary || 50000} ₽/мес</span><button class="btn-edit" onclick="editRate(${m.id}, 'manager', ${salaryData.monthly_salary || 50000})">✏️</button></div></div>`;
+            }
+            html += '</div>';
+            document.getElementById('managersSalaryList').innerHTML = html;
+        } catch(e) { document.getElementById('managersSalaryList').innerHTML = '<p style="color:red;">Ошибка</p>'; }
+    }
+    
+    function editRate(userId, type, currentValue) {
+        document.getElementById('rateUserId').value = userId;
+        document.getElementById('rateUserType').value = type;
+        document.getElementById('rateValue').value = currentValue;
+        document.getElementById('rateLabel').innerHTML = type === 'worker' ? 'Ставка (₽/час)' : 'Оклад (₽/мес)';
+        document.getElementById('rateModal').classList.add('active');
+    }
+    
+    function closeRateModal() { document.getElementById('rateModal').classList.remove('active'); }
+    
+    async function saveRate() {
+        const userId = document.getElementById('rateUserId').value;
+        const type = document.getElementById('rateUserType').value;
+        const value = document.getElementById('rateValue').value;
+        if (!value) { alert('Введите значение'); return; }
+        try {
+            let res;
+            if (type === 'worker') {
+                res = await fetch(`/api/salary/worker/${userId}/rate`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hourly_rate: parseFloat(value) }) });
+            } else {
+                res = await fetch(`/api/salary/manager/${userId}/salary`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ monthly_salary: parseFloat(value), bonus: 0 }) });
+            }
+            if (res.ok) { alert('✅ Ставка обновлена'); closeRateModal(); loadWorkersRates(); loadManagersSalaries(); }
+            else alert('❌ Ошибка');
+        } catch(e) { alert('Ошибка: ' + e.message); }
+    }
+    
+    // ========== СТАТИСТИКА ==========
+    async function loadStats() {
+        try {
+            const [workersRes, ratingRes, shiftsRes, revenueRes] = await Promise.all([
+                fetch('/api/admin/stats/workers-count'), fetch('/api/admin/stats/avg-rating'),
+                fetch('/api/admin/stats/weekly-shifts'), fetch('/api/admin/stats/month-revenue')
+            ]);
+            document.getElementById('workersCount').innerHTML = (await workersRes.json()).count || 0;
+            document.getElementById('avgRating').innerHTML = ((await ratingRes.json()).avg || 0).toFixed(1);
+            document.getElementById('weeklyShifts').innerHTML = (await shiftsRes.json()).count || 0;
+            document.getElementById('monthRevenue').innerHTML = ((await revenueRes.json()).total || 0).toLocaleString() + ' ₽';
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadWorkersRating() {
+        try {
+            const res = await fetch('/api/admin/stats/workers-rating');
+            const workers = await res.json();
+            const container = document.getElementById('workersRating');
+            if (!workers.length) container.innerHTML = '<p>Нет данных</p>';
+            else container.innerHTML = workers.map(w => `<div class="employee-rating-item"><span><strong>${escapeHtml(w.full_name)}</strong></span><span class="employee-rating-stars">${'★'.repeat(Math.round(w.rating || 0))}${'☆'.repeat(5 - Math.round(w.rating || 0))}</span><span>✅ ${w.orders_count || 0} заказов</span><span style="color:#8B7355;">⭐ ${w.rating || 0}</span></div>`).join('');
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadEmployeesRatingChart() {
+        try {
+            const res = await fetch('/api/admin/stats/workers-rating');
+            const workers = await res.json();
+            const container = document.getElementById('employeesRatingChart');
+            if (!workers.length) { container.innerHTML = '<p style="text-align:center;padding:40px;">Нет данных</p>'; return; }
+            workers.sort((a,b) => (b.rating||0) - (a.rating||0));
+            container.innerHTML = workers.map(w => {
+                const rating = parseFloat(w.rating) || 0;
+                const percent = (rating/5)*100;
+                let barColor = 'linear-gradient(90deg, #8B7355, #5D4A36)';
+                if (rating >= 4) barColor = 'linear-gradient(90deg, #4CAF50, #2E7D32)';
+                else if (rating >= 3) barColor = 'linear-gradient(90deg, #FFC107, #FF8F00)';
+                else if (rating >= 2) barColor = 'linear-gradient(90deg, #FF9800, #E65100)';
+                else barColor = 'linear-gradient(90deg, #f44336, #c62828)';
+                return `<div class="rating-chart-item"><div class="rating-chart-header"><span><strong>${escapeHtml(w.full_name)}</strong></span><span>⭐ ${rating.toFixed(1)} / 5</span></div><div class="rating-chart-bar"><div class="rating-chart-fill" style="width:${percent}%; background:${barColor};">${rating>0?rating.toFixed(1)+' ⭐':'0 ⭐'}</div></div><div style="margin-top:5px; font-size:0.8rem; color:#666;">✅ ${w.orders_count || 0} выполненных заказов</div></div>`;
+            }).join('');
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadPopularServices() {
+        try {
+            const res = await fetch('/api/admin/stats/popular-services');
+            const services = await res.json();
+            if (!services.length) return;
+            const labels = services.map(s => s.name);
+            const data = services.map(s => parseInt(s.count));
+            if (popularServicesChart) popularServicesChart.destroy();
+            const ctx = document.getElementById('popularServicesChart').getContext('2d');
+            popularServicesChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Количество заказов', data, backgroundColor: '#8B7355', borderRadius: 8 }] }, options: { responsive: true } });
+            document.getElementById('popularServices').innerHTML = services.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;"><span>${escapeHtml(s.name)}</span><span style="font-weight:600;">${s.count} заказов</span></div>`).join('');
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadReviewsDistribution() {
+        try {
+            const res = await fetch('/api/reviews');
+            const reviews = await res.json();
+            const distribution = {1:0,2:0,3:0,4:0,5:0};
+            reviews.forEach(r => { if (r.rating >= 1 && r.rating <= 5) distribution[r.rating]++; });
+            
+            if (reviewsRatingChart) reviewsRatingChart.destroy();
+            const ctx = document.getElementById('reviewsRatingChart').getContext('2d');
+            reviewsRatingChart = new Chart(ctx, { type: 'bar', data: { labels: ['⭐ 1', '⭐⭐ 2', '⭐⭐⭐ 3', '⭐⭐⭐⭐ 4', '⭐⭐⭐⭐⭐ 5'], datasets: [{ label: 'Количество отзывов', data: [distribution[1], distribution[2], distribution[3], distribution[4], distribution[5]], backgroundColor: '#FFD700', borderRadius: 8 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, stepSize: 1, title: { display: true, text: 'Количество отзывов' } } } } });
+            
+            const total = reviews.length;
+            const avgRating = total > 0 ? (reviews.reduce((s,r)=>s+r.rating,0)/total).toFixed(1) : 0;
+            document.getElementById('reviewsDistribution').innerHTML = `<div style="display:flex; gap:20px; justify-content:center; margin-bottom:15px;"><div><strong>📝 Всего отзывов:</strong> ${total}</div><div><strong>⭐ Средний рейтинг:</strong> ${avgRating}</div></div><div class="rating-distribution">${Object.entries(distribution).reverse().map(([stars,count])=>`<div class="rating-bar-item"><div class="rating-label"><span>${'★'.repeat(parseInt(stars))}</span><span>${count} отзывов</span></div><div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${total>0?(count/total)*100:0}%;">${total>0?Math.round((count/total)*100):0}%</div></div></div>`).join('')}</div>`;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadReviewsTrend() {
+        try {
+            const res = await fetch('/api/reviews/trend');
+            let data = await res.json();
+            if (reviewsTrendChart) reviewsTrendChart.destroy();
+            const ctx = document.getElementById('reviewsTrendChart').getContext('2d');
+            reviewsTrendChart = new Chart(ctx, { type: 'line', data: { labels: data.map(d=>d.date?.substring(5)), datasets: [{ label: 'Средний рейтинг', data: data.map(d=>parseFloat(d.avg_rating)||0), borderColor: '#FFD700', backgroundColor: 'rgba(255,215,0,0.1)', borderWidth: 3, fill: true, tension: 0.3 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, max: 5, title: { display: true, text: 'Средний рейтинг (⭐)' } } } } });
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadAllReviews() {
+        try {
+            const res = await fetch('/api/reviews');
+            const reviews = await res.json();
+            const container = document.getElementById('allReviewsList');
+            if (!reviews.length) { container.innerHTML = '<p style="text-align:center;padding:40px;">Нет отзывов</p>'; return; }
+            container.innerHTML = reviews.map(r => `<div class="review-item"><div class="review-header"><div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><div class="review-date">${new Date(r.created_at).toLocaleDateString()}</div></div><div class="review-comment">"${escapeHtml(r.comment)}"</div><div class="review-actions"><button class="btn-reply" onclick="openReplyModal(${r.id})">💬 Ответить</button><button class="btn-delete" onclick="deleteReview(${r.id})">🗑️ Удалить</button></div>${r.admin_reply?`<div class="review-answer"><strong>👑 Администратор:</strong><br>${escapeHtml(r.admin_reply)}</div>`:''}</div>`).join('');
+        } catch(e) { console.error(e); }
+    }
+    
+    function openReplyModal(id) { document.getElementById('replyReviewId').value = id; document.getElementById('replyModal').classList.add('active'); }
+    function closeReplyModal() { document.getElementById('replyModal').classList.remove('active'); }
+    
+    async function submitReply() {
+        const reviewId = document.getElementById('replyReviewId').value;
+        const reply = document.getElementById('replyText').value;
+        if (!reply.trim()) { alert('Введите текст ответа'); return; }
+        try {
+            const res = await fetch(`/api/reviews/${reviewId}/reply`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ admin_reply: reply }) });
+            if (res.ok) { alert('✅ Ответ добавлен'); closeReplyModal(); loadAllReviews(); }
+            else alert('❌ Ошибка');
+        } catch(e) { alert('Ошибка'); }
+    }
+    
+    async function deleteReview(id) {
+        if (!confirm('Удалить отзыв?')) return;
+        try {
+            const res = await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
+            if (res.ok) { alert('✅ Отзыв удалён'); loadAllReviews(); loadReviewsDistribution(); loadReviewsTrend(); }
+            else alert('❌ Ошибка');
+        } catch(e) { alert('Ошибка'); }
+    }
+    
+    // ========== УПРАВЛЕНИЕ УСЛУГАМИ ==========
+    async function loadServices() {
+        try {
+            const res = await fetch('/api/services');
+            const services = await res.json();
+            document.getElementById('servicesTableBody').innerHTML = services.map(s => `<tr><td>${s.id}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.category)}</td><td>${s.base_price} ₽</td><td><button class="btn-edit" onclick="editService(${s.id})">✏️</button><button class="btn-delete" onclick="deleteService(${s.id})">🗑️</button></td>`).join('');
+        } catch(e) { console.error(e); }
+    }
+    
+    function editService(id) {
+        fetch(`/api/services/${id}`).then(res=>res.json()).then(s=>{
+            document.getElementById('serviceId').value = s.id;
+            document.getElementById('serviceName').value = s.name;
+            document.getElementById('serviceDescription').value = s.description||'';
+            document.getElementById('serviceCategory').value = s.category;
+            document.getElementById('servicePriceType').value = s.price_type;
+            document.getElementById('serviceBasePrice').value = s.base_price;
+            document.getElementById('servicePricePerUnit').value = s.price_per_unit||'';
+            document.getElementById('serviceModalTitle').innerHTML = 'Редактировать услугу';
+            document.getElementById('serviceModal').classList.add('active');
+        });
+    }
+    
+    async function deleteService(id) { if(confirm('Удалить услугу?')){ await fetch(`/api/services/${id}`,{method:'DELETE'}); loadServices(); loadPopularServices(); } }
+    async function saveService() {
+        const id = document.getElementById('serviceId').value;
+        const service = { name: document.getElementById('serviceName').value, description: document.getElementById('serviceDescription').value, category: document.getElementById('serviceCategory').value, price_type: document.getElementById('servicePriceType').value, base_price: parseFloat(document.getElementById('serviceBasePrice').value), price_per_unit: parseFloat(document.getElementById('servicePricePerUnit').value)||null };
+        const res = await fetch(id ? `/api/services/${id}` : '/api/services', { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(service) });
+        if(res.ok) { closeServiceModal(); loadServices(); loadPopularServices(); } else alert('Ошибка');
+    }
+    function closeServiceModal() { document.getElementById('serviceModal').classList.remove('active'); document.getElementById('serviceId').value = ''; }
+    
+    // ========== УПРАВЛЕНИЕ СОТРУДНИКАМИ ==========
+    async function loadEmployees() {
+        try {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+            const employees = users.filter(u => u.role !== 'admin');
+            let html = '';
+            for (const u of employees) {
+                let rate = '';
+                if (u.role === 'worker') {
+                    const rateRes = await fetch(`/api/salary/worker/${u.id}`);
+                    const rateData = await rateRes.json();
+                    rate = `${rateData.hourly_rate || 500} ₽/час`;
+                } else {
+                    const salaryRes = await fetch(`/api/salary/manager/${u.id}`);
+                    const salaryData = await salaryRes.json();
+                    rate = `${salaryData.monthly_salary || 50000} ₽/мес`;
+                }
+                html += `<td><td>${u.id}</td><td>${escapeHtml(u.full_name)}</td><td>${escapeHtml(u.phone)}</td><td>${u.role === 'worker' ? '👨‍🔧 Сотрудник' : '📋 Менеджер'}</td><td>${rate}</td><td><button class="btn-edit" onclick="editEmployee(${u.id})">✏️</button><button class="btn-delete" onclick="deleteEmployee(${u.id})">🗑️</button></td></tr>`;
+            }
+            document.getElementById('employeesTableBody').innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    function editEmployee(id) {
+        fetch(`/api/users/${id}`).then(res=>res.json()).then(u=>{
+            document.getElementById('employeeId').value = u.id;
+            document.getElementById('employeeName').value = u.full_name;
+            document.getElementById('employeePhone').value = u.phone;
+            document.getElementById('employeeRole').value = u.role;
+            document.getElementById('employeeModalTitle').innerHTML = 'Редактировать сотрудника';
+            document.getElementById('employeeModal').classList.add('active');
+        });
+    }
+    
+    async function deleteEmployee(id) { if(confirm('Удалить сотрудника?')){ await fetch(`/api/users/${id}`,{method:'DELETE'}); loadEmployees(); loadStats(); loadWorkersRating(); loadEmployeesRatingChart(); loadWorkersRates(); loadManagersSalaries(); } }
+    
+    async function saveEmployee() {
+        const id = document.getElementById('employeeId').value;
+        const employee = { full_name: document.getElementById('employeeName').value.trim(), phone: document.getElementById('employeePhone').value.trim(), role: document.getElementById('employeeRole').value, password: document.getElementById('employeePassword').value };
+        if(!employee.full_name) { alert('Введите имя'); return; }
+        if(!employee.phone) { alert('Введите телефон'); return; }
+        if(!employee.password && !id) { alert('Введите пароль'); return; }
+        const res = await fetch(id ? `/api/users/${id}` : '/api/users', { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(employee) });
+        if(res.ok) { closeEmployeeModal(); loadEmployees(); loadStats(); loadWorkersRating(); loadEmployeesRatingChart(); loadWorkersRates(); loadManagersSalaries(); }
+        else alert('Ошибка');
+    }
+    function closeEmployeeModal() { document.getElementById('employeeModal').classList.remove('active'); document.getElementById('employeeId').value = ''; document.getElementById('employeePassword').value = ''; }
+    
+ // ========== КАЛЕНДАРЬ СМЕН ==========
+async function openShiftsCalendar() {
+    try {
+        const [shiftsRes, workersRes] = await Promise.all([
+            fetch('/api/shifts'),
+            fetch('/api/workers/list')
+        ]);
+        
+        const allShifts = await shiftsRes.json();
+        const allWorkers = await workersRes.json();
+        allWorkers.sort((a, b) => a.full_name.localeCompare(b.full_name));
+        
+        const weekDays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        const day = today.getDay();
+        const daysToMonday = day === 0 ? 6 : day - 1;
+        startOfWeek.setDate(today.getDate() - daysToMonday);
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        const weekDates = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startOfWeek);
+            date.setDate(startOfWeek.getDate() + i);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const dayNum = String(date.getDate()).padStart(2, '0');
+            weekDates.push({ 
+                date: `${year}-${month}-${dayNum}`, 
+                display: `${dayNum}.${month}`
+            });
+        }
+        
+        function normalizeDate(dateStr) {
+            if (!dateStr) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return '';
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const dayNum = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${dayNum}`;
+        }
+        
+        const normalizedShifts = allShifts.map(s => ({
+            ...s,
+            shift_date: normalizeDate(s.shift_date)
+        }));
+        
+        let html = `
+            <div id="shiftsModal" class="shifts-modal-overlay">
+                <div class="shifts-modal-content">
+                    <div class="shifts-modal-header">
+                        <h2>📅 Календарь смен на текущую неделю</h2>
+                        <button class="shifts-modal-close" onclick="closeShiftsModal()">&times;</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="shifts-schedule-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 150px;">Сотрудник</th>
+                                    ${weekDates.map((wd, idx) => `<th>${weekDays[idx]}<br>${wd.display}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+        `;
+        
+        for (const worker of allWorkers) {
+            html += `<tr>
+                        <td style="background: #f8f5f0; font-weight: 600;">${escapeHtml(worker.full_name)}</td>`;
+            
+            for (let i = 0; i < 7; i++) {
+                const dateStr = weekDates[i].date;
+                const dayShifts = normalizedShifts.filter(s => s.worker_id === worker.id && s.shift_date === dateStr);
+                
+                html += '<td style="vertical-align: top;">';
+                if (dayShifts.length > 0) {
+                    dayShifts.forEach(s => {
+                        html += `<div class="shift-card-small">
+                                    <div style="font-weight: 600;">${s.start_time?.substring(0,5) || '09:00'} - ${s.end_time?.substring(0,5) || '18:00'}</div>
+                                    <div style="font-size: 0.75rem;">${escapeHtml(s.description || 'Смена')}</div>
+                                </div>`;
+                    });
+                } else {
+                    html += '<div style="color: #ccc; text-align: center; padding: 8px;">—</div>';
+                }
+                html += '</td>';
+            }
+            html += '</tr>';
+        }
+        
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="shifts-modal-footer">
+                        <button class="btn-add" onclick="closeShiftsModal()" style="background: #5D4A36;">Закрыть</button>
+                        <button class="btn-add" onclick="location.href='manager-cabinet.html'" style="background: #8B7355;">✏️ Перейти к управлению</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', html);
+    } catch(e) {
+        console.error('Ошибка загрузки календаря:', e);
+        alert('Ошибка загрузки расписания: ' + e.message);
+    }
+}
+
+function closeShiftsModal() {
+    const modal = document.querySelector('.shifts-modal-overlay');
+    if (modal) modal.remove();
+}
+    function closeShiftsModal() { document.querySelector('.shifts-modal-overlay')?.remove(); }
+    function logout() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    document.getElementById('addServiceBtn').onclick = () => document.getElementById('serviceModal').classList.add('active');
+    document.getElementById('addEmployeeBtn').onclick = () => document.getElementById('employeeModal').classList.add('active');
+    document.getElementById('shiftsCard')?.addEventListener('click', openShiftsCalendar);
+    document.getElementById('revenueCard')?.addEventListener('click', () => document.querySelector('.tab-btn[data-tab="finance"]').click());
+    
+    const burger = document.getElementById('burgerMenu'), menu = document.getElementById('navMenu');
+    if(burger && menu) burger.addEventListener('click',()=>{ burger.classList.toggle('active'); menu.classList.toggle('active'); });
+    
+    loadStats(); loadWorkersRating(); loadPopularServices(); loadReviewsDistribution(); loadServices(); loadEmployees();
+    loadOrdersByMonthChart(); loadRevenueByMonthChart();
+</script>
+</body>
+</html>

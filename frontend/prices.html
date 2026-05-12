@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цены | Чистый дом - Клининг в Иркутске</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        .prices-page { padding-top: 100px; padding-bottom: 60px; }
+        .prices-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; flex-wrap: wrap; gap: 30px; }
+        .prices-header h1 { font-size: 3rem; color: #2c2c2c; margin: 0; position: relative; display: inline-block; }
+        .prices-header h1::after { content: ''; position: absolute; bottom: -15px; left: 0; width: 120px; height: 4px; background: #8B7355; border-radius: 2px; }
+        .prices-header p { font-size: 1.2rem; color: #666; max-width: 500px; margin: 0; font-style: italic; padding: 20px; background: #f8f5f0; border-radius: 16px; }
+        .price-section { margin-bottom: 60px; background: #ffffff; border-radius: 30px; padding: 40px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05); }
+        .price-section h2 { font-size: 2.2rem; color: #5D4A36; margin-bottom: 30px; border-bottom: 2px solid #e8e0d5; padding-bottom: 15px; position: relative; }
+        .price-section h2::before { content: ''; position: absolute; bottom: -2px; left: 0; width: 150px; height: 2px; background: #8B7355; }
+        .price-table-container { overflow-x: auto; margin-bottom: 20px; border-radius: 16px; border: 1px solid #f0e9e0; }
+        .price-table { width: 100%; border-collapse: collapse; font-size: 1rem; min-width: 600px; }
+        .price-table th { background: #f8f5f0; color: #5D4A36; font-weight: 600; padding: 15px; text-align: center; border-bottom: 2px solid #8B7355; }
+        .price-table td { padding: 12px 15px; text-align: center; border-bottom: 1px solid #f0e9e0; }
+        .price-table tr:hover td { background-color: #faf7f2; }
+        .price-table .category-cell { font-weight: 600; color: #3a3a3a; text-align: left; }
+        .calculator-section { background: #ffffff; border-radius: 40px; padding: 50px; margin: 60px 0; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1); }
+        .calculator-section h2 { font-size: 2.5rem; color: #2c2c2c; margin-bottom: 30px; text-align: center; position: relative; }
+        .calculator-section h2::after { content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 100px; height: 4px; background: #8B7355; border-radius: 2px; }
+        .calculator-form { max-width: 900px; margin: 40px auto 0; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-size: 1.1rem; font-weight: 500; color: #3a3a3a; margin-bottom: 10px; }
+        .form-group select { width: 100%; padding: 15px; border: 2px solid #e8e0d5; border-radius: 12px; font-size: 1rem; font-family: 'Inter', sans-serif; background: #fefcf9; cursor: pointer; }
+        .selected-services { background: #f8f5f0; border-radius: 20px; padding: 25px; margin: 20px 0; }
+        .selected-services h3 { font-size: 1.3rem; color: #5D4A36; margin-bottom: 15px; }
+        .service-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px dashed #d9cec0; gap: 15px; flex-wrap: wrap; }
+        .service-item:last-child { border-bottom: none; }
+        .service-checkbox { width: 20px; height: 20px; accent-color: #8B7355; cursor: pointer; }
+        .service-name { flex: 2; min-width: 200px; font-weight: 500; color: #3a3a3a; }
+        .service-param { flex: 1; min-width: 150px; }
+        .service-param select, .service-param input { width: 100%; padding: 8px 12px; border: 2px solid #e8e0d5; border-radius: 8px; font-size: 0.95rem; background: white; }
+        .service-price { flex: 0.5; min-width: 100px; text-align: right; font-weight: 600; color: #5D4A36; font-size: 1.1rem; }
+        .total-price { font-size: 2rem; font-weight: 700; color: #5D4A36; text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e8e0d5; }
+        .calculator-buttons { display: flex; gap: 20px; justify-content: flex-end; margin-top: 30px; }
+        .btn-calculate { background-color: #5D4A36; color: white; border: none; padding: 15px 40px; font-size: 1.1rem; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-calculate:hover { background-color: #8B7355; transform: translateY(-2px); }
+        .btn-reset { background: transparent; border: 2px solid #5D4A36; color: #5D4A36; padding: 15px 40px; font-size: 1.1rem; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-reset:hover { background: #5D4A36; color: white; }
+        @media (max-width: 768px) {
+            .prices-page { padding-top: 80px; }
+            .prices-header { flex-direction: column; align-items: flex-start; }
+            .prices-header h1 { font-size: 2.2rem; }
+            .price-section { padding: 25px; }
+            .service-item { flex-direction: column; align-items: flex-start; }
+            .calculator-section { padding: 30px 20px; }
+            .calculator-buttons { flex-direction: column; }
+            .btn-calculate, .btn-reset { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+<div id="modal-placeholder"></div>
+<div id="client-modal-placeholder"></div>
+
+<div class="prices-page">
+    <div class="container">
+        <div class="prices-header">
+            <h1>Цены на услуги</h1>
+            <p>Мы работаем без скрытых платежей. Итоговая стоимость фиксируется до начала уборки и не меняется.</p>
+        </div>
+        
+        <div id="prices-container">
+            <div class="loading">Загрузка цен...</div>
+        </div>
+
+        <div class="calculator-section" id="calculator">
+            <h2>Калькулятор стоимости</h2>
+            <div class="calculator-form">
+                <div class="form-group">
+                    <label>Выберите категорию услуги:</label>
+                    <select id="serviceCategory">
+                        <option value="apartment">Уборка квартир</option>
+                        <option value="house">Уборка домов и коттеджей</option>
+                        <option value="office">Уборка офисов</option>
+                        <option value="additional">Дополнительные услуги</option>
+                    </select>
+                </div>
+                <div id="serviceList">
+                    <div class="selected-services">
+                        <h3>Выбранные услуги:</h3>
+                        <div id="selectedServicesContainer">Выберите категорию</div>
+                    </div>
+                </div>
+                <div id="totalContainer">
+                    <div class="total-price" id="totalPrice">0 ₽</div>
+                    <div class="calculator-buttons">
+                        <button class="btn-reset" id="resetCalculator">Сбросить все</button>
+                        <button class="btn-calculate" id="orderButton">Оформить заявку</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="components/loader.js"></script>
+<script src="script.js"></script>
+<script>
+    let allServices = [];
+    let selectedServices = {};
+    
+    async function loadServices() {
+        try {
+            const response = await fetch('/api/services');
+            allServices = await response.json();
+            renderPrices();
+            showServices('apartment');
+        } catch (error) {
+            console.error('Ошибка загрузки услуг:', error);
+            document.getElementById('prices-container').innerHTML = '<div class="loading">Ошибка загрузки цен</div>';
+        }
+    }
+    
+    function renderPrices() {
+        const categories = {
+            apartment: 'Уборка квартир',
+            house: 'Уборка домов и коттеджей',
+            office: 'Уборка офисов',
+            additional: 'Дополнительные услуги'
+        };
+        
+        let html = '';
+        for (const [cat, title] of Object.entries(categories)) {
+            const catServices = allServices.filter(s => s.category === cat);
+            if (catServices.length === 0) continue;
+            
+            html += `
+                <div class="price-section">
+                    <h2>${title}</h2>
+                    <div class="price-table-container">
+                        <table class="price-table">
+                            <thead><tr><th>Услуга</th><th>Стоимость</th></tr></thead>
+                            <tbody>
+                                ${catServices.map(service => `
+                                    <tr>
+                                        <td class="category-cell">${escapeHtml(service.name)}</td>
+                                        <td>от ${service.base_price} ₽ ${service.price_type === 'rooms' ? '/ комната' : ''}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        document.getElementById('prices-container').innerHTML = html;
+    }
+    
+    function showServices(category) {
+        const container = document.getElementById('selectedServicesContainer');
+        const services = allServices.filter(s => s.category === category);
+        
+        if (services.length === 0) {
+            container.innerHTML = '<p>Нет услуг в этой категории</p>';
+            return;
+        }
+        
+        selectedServices = {};
+        container.innerHTML = '';
+        
+        services.forEach(service => {
+            const div = document.createElement('div');
+            div.className = 'service-item';
+            
+            let paramsHtml = '';
+            if (service.price_type === 'rooms') {
+                paramsHtml = `<select class="service-param" data-id="${service.id}" data-type="rooms">
+                    <option value="0">Студия/1-комн</option>
+                    <option value="1">2-комнатная</option>
+                    <option value="2">3-комнатная</option>
+                    <option value="3">4+ комнат</option>
+                </select>`;
+            } else if (service.price_type === 'area') {
+                paramsHtml = `<input type="number" class="service-param" data-id="${service.id}" data-type="area" value="50" min="0" step="1" placeholder="м²">`;
+            } else {
+                paramsHtml = `<span style="font-size:0.85rem; color:#888;">фиксированная</span>`;
+            }
+            
+            div.innerHTML = `
+                <input type="checkbox" class="service-checkbox" data-id="${service.id}">
+                <span class="service-name">${escapeHtml(service.name)}</span>
+                <div class="service-param">${paramsHtml}</div>
+                <div class="service-price" id="price-${service.id}">0 ₽</div>
+            `;
+            container.appendChild(div);
+            
+            const checkbox = div.querySelector('.service-checkbox');
+            const paramEl = div.querySelector('.service-param select, .service-param input');
+            
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    selectedServices[service.id] = service;
+                    updateServicePrice(service, paramEl);
+                } else {
+                    delete selectedServices[service.id];
+                    const priceEl = document.getElementById(`price-${service.id}`);
+                    if (priceEl) priceEl.textContent = '0 ₽';
+                }
+                updateTotalPrice();
+            });
+            
+            if (paramEl && (service.price_type === 'rooms' || service.price_type === 'area')) {
+                paramEl.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        updateServicePrice(service, this);
+                        updateTotalPrice();
+                    }
+                });
+            }
+        });
+        updateTotalPrice();
+    }
+    
+    function updateServicePrice(service, paramEl) {
+        const priceEl = document.getElementById(`price-${service.id}`);
+        if (!priceEl) return;
+        
+        const basePrice = parseFloat(service.base_price) || 0;
+        const pricePerUnit = parseFloat(service.price_per_unit) || 0;
+        
+        if (service.price_type === 'rooms') {
+            const roomVal = paramEl ? parseInt(paramEl.value) : 0;
+            let price = basePrice;
+            
+            if (roomVal === 1) price = basePrice + pricePerUnit;
+            else if (roomVal === 2) price = basePrice + pricePerUnit * 2;
+            else if (roomVal >= 3) price = basePrice + pricePerUnit * 3;
+            
+            priceEl.textContent = Math.round(price) + ' ₽';
+            
+        } else if (service.price_type === 'area') {
+            const area = paramEl ? parseInt(paramEl.value) : 50;
+            let price = basePrice;
+            
+            if (area > 100) {
+                const extraBlocks = Math.ceil((area - 100) / 50);
+                price = basePrice + extraBlocks * 1500;
+            }
+            
+            priceEl.textContent = Math.round(price) + ' ₽';
+            
+        } else {
+            priceEl.textContent = basePrice + ' ₽';
+        }
+    }
+    
+    function updateTotalPrice() {
+        let total = 0;
+        for (const [id, service] of Object.entries(selectedServices)) {
+            const priceEl = document.getElementById(`price-${id}`);
+            if (priceEl) {
+                const match = priceEl.textContent.match(/(\d+)/);
+                if (match) total += parseInt(match[0]);
+            }
+        }
+        document.getElementById('totalPrice').textContent = total + ' ₽';
+    }
+    
+    function saveSelectedServices() {
+        if (Object.keys(selectedServices).length === 0) {
+            alert('Выберите хотя бы одну услугу');
+            return false;
+        }
+        
+        const servicesData = [];
+        for (const [id, service] of Object.entries(selectedServices)) {
+            const priceEl = document.getElementById(`price-${id}`);
+            const priceMatch = priceEl.textContent.match(/(\d+)/);
+            servicesData.push({
+                service_id: id,
+                name: service.name,
+                price: priceMatch ? parseInt(priceMatch[0]) : 0
+            });
+        }
+        
+        localStorage.setItem('selectedServices', JSON.stringify(servicesData));
+        localStorage.setItem('totalPrice', document.getElementById('totalPrice').textContent);
+        return true;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Обработчики
+    document.getElementById('serviceCategory').addEventListener('change', function(e) {
+        showServices(e.target.value);
+    });
+    
+    document.getElementById('resetCalculator').addEventListener('click', function() {
+        showServices(document.getElementById('serviceCategory').value);
+    });
+    
+    // КНОПКА ЗАКАЗА - ПРОВЕРКА АВТОРИЗАЦИИ
+    const orderButton = document.getElementById('orderButton');
+    if (orderButton) {
+        orderButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const client = localStorage.getItem('client');
+            
+            if (!client) {
+                const modal = document.getElementById('clientModal');
+                if (modal) {
+                    modal.classList.add('active');
+                    const loginForm = document.getElementById('clientLoginForm');
+                    const registerForm = document.getElementById('clientRegisterForm');
+                    if (loginForm) loginForm.style.display = 'block';
+                    if (registerForm) registerForm.style.display = 'none';
+                } else {
+                    alert('Пожалуйста, авторизуйтесь через кнопку "Войти" вверху страницы');
+                }
+            } else {
+                if (saveSelectedServices()) {
+                    window.location.href = 'order.html';
+                }
+            }
+        });
+    }
+    
+    loadServices();
+</script>
+</body>
+</html>

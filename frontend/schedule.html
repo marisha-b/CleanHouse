@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь смен | Чистый дом</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        .schedule-page { padding-top: 100px; padding-bottom: 80px; background: linear-gradient(135deg, #f8f9fa 0%, #f0e9e0 100%); min-height: 100vh; }
+        .schedule-header { text-align: center; margin-bottom: 50px; }
+        .schedule-header h1 { font-size: 3rem; color: #2c2c2c; margin-bottom: 1rem; position: relative; display: inline-block; }
+        .schedule-header h1::after { content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 120px; height: 4px; background: #8B7355; border-radius: 2px; }
+        .schedule-header p { font-size: 1.2rem; color: #666; max-width: 800px; margin: 30px auto 0; }
+        
+        .tabs-container { max-width: 1400px; margin: 0 auto; background: #ffffff; border-radius: 40px; padding: 30px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1); }
+        
+        .week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 20px; background: #f8f5f0; border-radius: 20px; flex-wrap: wrap; gap: 15px; }
+        .week-nav button { background: #5D4A36; color: white; border: none; padding: 8px 25px; border-radius: 30px; cursor: pointer; transition: all 0.3s; font-size: 1rem; }
+        .week-nav button:hover { background: #8B7355; transform: translateY(-2px); }
+        .week-nav span { font-size: 1.2rem; font-weight: 600; color: #5D4A36; }
+        .refresh-btn { background: #8B7355; }
+        .refresh-btn:hover { background: #5D4A36; }
+        
+        .schedule-wrapper { overflow-x: auto; }
+        .schedule-table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; min-width: 800px; }
+        .schedule-table th, .schedule-table td { border: 1px solid #e8e0d5; padding: 12px; vertical-align: top; }
+        .schedule-table th { background: #5D4A36; color: white; font-weight: 500; text-align: center; }
+        .employee-cell { background: #f8f5f0; font-weight: 600; color: #5D4A36; vertical-align: middle; text-align: center; }
+        .shift-card { background: #f8f5f0; border-radius: 12px; padding: 8px 12px; margin-bottom: 8px; border-left: 4px solid #8B7355; }
+        .shift-time { font-weight: 600; color: #5D4A36; font-size: 0.85rem; }
+        .shift-title { color: #666; font-size: 0.85rem; margin-top: 4px; }
+        .loading { text-align: center; padding: 40px; font-size: 1.2rem; color: #666; }
+        .error-message { text-align: center; padding: 40px; color: #cc0000; background: #ffe0e0; border-radius: 20px; margin: 20px; }
+        .no-data { text-align: center; padding: 40px; color: #999; }
+        
+        @media (max-width: 768px) {
+            .schedule-page { padding-top: 80px; }
+            .schedule-header h1 { font-size: 2rem; }
+            .tabs-container { padding: 20px; }
+            .week-nav { flex-direction: column; text-align: center; }
+            .week-nav span { font-size: 1rem; }
+            .schedule-table th, .schedule-table td { padding: 8px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+<div id="modal-placeholder"></div>
+
+<div class="schedule-page">
+    <div class="container">
+        <div class="schedule-header">
+            <h1>Календарь смен</h1>
+            <p>Актуальное расписание работы сотрудников на текущую неделю</p>
+        </div>
+        <div class="tabs-container">
+            <div class="week-nav">
+                <button id="prevWeekBtn" class="refresh-btn">◀ Предыдущая неделя</button>
+                <span id="weekRange">Загрузка...</span>
+                <button id="nextWeekBtn" class="refresh-btn">Следующая неделя ▶</button>
+                <button id="refreshBtn" class="refresh-btn" style="background: #8B7355;">🔄 Обновить</button>
+            </div>
+            <div id="scheduleContainer">
+                <div class="loading">Загрузка расписания...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="components/loader.js"></script>
+<script>
+    let allShifts = [];
+    let allWorkers = [];
+    let currentWeekOffset = 0; // 0 = текущая неделя, -1 = прошлая, 1 = следующая
+    
+    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function normalizeDate(dateStr) {
+        if (!dateStr) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    function formatDateRu(date) {
+        return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+    }
+    
+    function formatDayName(date) {
+        const days = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+        const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
+        return days[dayIndex];
+    }
+    
+    // Получить дату начала недели (понедельник) с учётом смещения
+    function getStartOfWeek(offset = 0) {
+        const today = new Date();
+        const currentMonday = new Date(today);
+        const day = today.getDay();
+        const daysToMonday = day === 0 ? 6 : day - 1;
+        currentMonday.setDate(today.getDate() - daysToMonday);
+        currentMonday.setHours(0, 0, 0, 0);
+        
+        // Добавляем смещение (offset * 7 дней)
+        const result = new Date(currentMonday);
+        result.setDate(currentMonday.getDate() + (offset * 7));
+        return result;
+    }
+    
+    // Получить все даты недели
+    function getWeekDates(startDate) {
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            dates.push({
+                dateStr: `${year}-${month}-${day}`,
+                display: `${day}.${month}`,
+                fullDate: date
+            });
+        }
+        return dates;
+    }
+    
+    // Обновить заголовок с диапазоном недели
+    function updateWeekRange(startDate) {
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        const rangeText = `${formatDateRu(startDate)} - ${formatDateRu(endDate)}`;
+        document.getElementById('weekRange').textContent = rangeText;
+    }
+    
+    // ========== ЗАГРУЗКА ДАННЫХ ==========
+    async function loadWorkers() {
+        try {
+            const response = await fetch('/api/workers/list');
+            if (!response.ok) throw new Error('Ошибка загрузки сотрудников');
+            allWorkers = await response.json();
+            console.log('Загружено сотрудников:', allWorkers.length);
+        } catch (error) {
+            console.error('Ошибка загрузки сотрудников:', error);
+            allWorkers = [];
+        }
+    }
+    
+    async function loadShifts() {
+        try {
+            const response = await fetch('/api/shifts');
+            if (!response.ok) throw new Error('Ошибка загрузки смен');
+            allShifts = await response.json();
+            console.log('Загружено смен:', allShifts.length);
+            
+            // Нормализуем даты
+            allShifts = allShifts.map(shift => ({
+                ...shift,
+                shift_date: normalizeDate(shift.shift_date)
+            }));
+        } catch (error) {
+            console.error('Ошибка загрузки смен:', error);
+            allShifts = [];
+        }
+    }
+    
+    // ========== ОТОБРАЖЕНИЕ РАСПИСАНИЯ ==========
+    async function renderSchedule() {
+        const container = document.getElementById('scheduleContainer');
+        if (!container) return;
+        
+        // Показываем загрузку
+        container.innerHTML = '<div class="loading">Загрузка расписания...</div>';
+        
+        // Загружаем данные если их нет
+        if (allWorkers.length === 0) await loadWorkers();
+        if (allShifts.length === 0) await loadShifts();
+        
+        if (allWorkers.length === 0) {
+            container.innerHTML = '<div class="no-data">👥 Нет сотрудников в базе данных</div>';
+            return;
+        }
+        
+        // Получаем даты текущей недели
+        const startOfWeek = getStartOfWeek(currentWeekOffset);
+        const weekDates = getWeekDates(startOfWeek);
+        updateWeekRange(startOfWeek);
+        
+        // Создаём карту смен для быстрого доступа
+        const shiftsMap = new Map();
+        allShifts.forEach(shift => {
+            const key = `${shift.worker_id}_${shift.shift_date}`;
+            if (!shiftsMap.has(key)) shiftsMap.set(key, []);
+            shiftsMap.get(key).push(shift);
+        });
+        
+        // Сортируем сотрудников по имени
+        const sortedWorkers = [...allWorkers].sort((a, b) => a.full_name.localeCompare(b.full_name));
+        
+        let html = `
+            <div class="schedule-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 160px;">Сотрудник</th>
+                            ${weekDates.map(wd => `<th>${formatDayName(wd.fullDate)}<br>${wd.display}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        for (const worker of sortedWorkers) {
+            html += `<tr>
+                <td class="employee-cell">${escapeHtml(worker.full_name)}</td>
+            `;
+            
+            for (const wd of weekDates) {
+                const key = `${worker.id}_${wd.dateStr}`;
+                const dayShifts = shiftsMap.get(key) || [];
+                
+                html += `<td style="vertical-align: top;">`;
+                if (dayShifts.length > 0) {
+                    dayShifts.forEach(shift => {
+                        html += `
+                            <div class="shift-card">
+                                <div class="shift-time">${shift.start_time?.substring(0,5) || '09:00'} - ${shift.end_time?.substring(0,5) || '18:00'}</div>
+                                <div class="shift-title">${escapeHtml(shift.description || 'Рабочая смена')}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div style="color: #ccc; text-align: center; padding: 8px;">—</div>`;
+                }
+                html += `</td>`;
+            }
+            html += `</tr>`;
+        }
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    // ========== НАВИГАЦИЯ ПО НЕДЕЛЯМ ==========
+    async function goPrevWeek() {
+        currentWeekOffset--;
+        await renderSchedule();
+    }
+    
+    async function goNextWeek() {
+        currentWeekOffset++;
+        await renderSchedule();
+    }
+    
+    async function refreshData() {
+        // Очищаем кэш и загружаем заново
+        allShifts = [];
+        allWorkers = [];
+        currentWeekOffset = 0;
+        await loadWorkers();
+        await loadShifts();
+        await renderSchedule();
+    }
+    
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Загружаем компоненты
+        await loadComponent('navbar-placeholder', 'components/navbar.html');
+        await loadComponent('footer-placeholder', 'components/footer.html');
+        await loadComponent('modal-placeholder', 'components/worker-login-modal.html');
+        
+        // Загружаем данные
+        await loadWorkers();
+        await loadShifts();
+        await renderSchedule();
+        
+        // Назначаем обработчики
+        const prevBtn = document.getElementById('prevWeekBtn');
+        const nextBtn = document.getElementById('nextWeekBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        if (prevBtn) prevBtn.addEventListener('click', goPrevWeek);
+        if (nextBtn) nextBtn.addEventListener('click', goNextWeek);
+        if (refreshBtn) refreshBtn.addEventListener('click', refreshData);
+        
+        // Инициализируем бургер-меню и модалку
+        setTimeout(() => {
+            if (typeof initBurgerMenu === 'function') initBurgerMenu();
+            if (typeof initWorkerLoginButton === 'function') initWorkerLoginButton();
+        }, 200);
+    });
+</script>
+</body>
+</html>

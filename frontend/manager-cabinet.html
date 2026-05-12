@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Менеджер-панель | Чистый дом</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f8f9fa 0%, #f0e9e0 100%); min-height: 100vh; }
+        
+        .navbar { background: #1a1a1a; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 15px 20px; }
+        .nav-menu { display: flex; list-style: none; gap: 25px; }
+        .nav-link { color: white; text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: #FFE74A; }
+        .burger-menu { display: none; flex-direction: column; cursor: pointer; }
+        .burger-menu span { width: 25px; height: 3px; background: white; margin: 3px 0; transition: 0.3s; }
+        
+        .manager-cabinet { max-width: 1400px; margin: 100px auto 40px; padding: 0 20px; }
+        .manager-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; background: white; padding: 20px 30px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .manager-header h1 { color: #5D4A36; font-size: 1.8rem; }
+        
+        .btn-back { background: #8B7355; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; transition: all 0.3s; }
+        .btn-back:hover { background: #5D4A36; transform: translateY(-2px); }
+        .btn-logout { background: #cc0000; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .btn-logout:hover { background: #990000; transform: translateY(-2px); }
+        .btn-refresh { background: #8B7355; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; transition: all 0.3s; margin-right: 10px; }
+        .btn-refresh:hover { background: #5D4A36; transform: translateY(-2px); }
+        
+        .tabs { display: flex; gap: 15px; border-bottom: 2px solid #e8e0d5; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 25px; background: none; border: none; font-size: 1rem; cursor: pointer; color: #666; border-radius: 30px 30px 0 0; transition: 0.3s; }
+        .tab-btn:hover { background: #f8f5f0; color: #5D4A36; }
+        .tab-btn.active { color: #5D4A36; border-bottom: 3px solid #5D4A36; font-weight: 600; }
+        .tab-panel { display: none; animation: fadeIn 0.3s; }
+        .tab-panel.active { display: block; }
+        
+        .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .data-table th, .data-table td { border: 1px solid #e8e0d5; padding: 12px; text-align: left; vertical-align: middle; }
+        .data-table th { background: #5D4A36; color: white; font-weight: 500; }
+        .data-table tr:hover { background: #f8f5f0; }
+        
+        .btn-assign { background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
+        .btn-assign:hover { background: #45a049; transform: scale(1.02); }
+        .btn-view { background: #2196F3; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
+        .btn-view:hover { background: #1976D2; transform: scale(1.02); }
+        .btn-reply { background: #FF9800; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
+        .btn-reply:hover { background: #e68900; transform: scale(1.02); }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-new { background: #ff9800; color: white; }
+        .badge-progress { background: #2196F3; color: white; }
+        .badge-completed { background: #4CAF50; color: white; }
+        
+        .assign-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .assign-modal.active { display: flex; }
+        .assign-modal-content { background: white; border-radius: 30px; padding: 35px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .assign-modal-content h3 { color: #5D4A36; margin-bottom: 20px; text-align: center; }
+        .assign-modal-content select { width: 100%; padding: 14px; margin-bottom: 20px; border: 2px solid #e8e0d5; border-radius: 12px; font-size: 1rem; transition: border-color 0.3s; }
+        .assign-modal-content select:focus { outline: none; border-color: #8B7355; }
+        .info-text { background: #e8f5e9; padding: 15px; border-radius: 12px; margin-bottom: 25px; font-size: 0.95rem; border-left: 4px solid #4CAF50; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px; }
+        .btn-save { background: #5D4A36; color: white; border: none; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: all 0.3s; }
+        .btn-save:hover { background: #8B7355; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(93,74,54,0.3); }
+        .btn-cancel { background: #999; color: white; border: none; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: all 0.3s; }
+        .btn-cancel:hover { background: #777; transform: translateY(-2px); }
+        
+        .photo-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; cursor: pointer; margin: 2px; transition: transform 0.2s; }
+        .photo-thumb:hover { transform: scale(1.1); }
+        
+        .stars-display { color: #FFD700; font-size: 1rem; letter-spacing: 2px; }
+        .photo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; }
+        .photo-modal.active { display: flex; }
+        .photo-modal-content { background: white; border-radius: 20px; padding: 20px; max-width: 90%; max-height: 90%; overflow: auto; text-align: center; }
+        .photo-modal-content img { max-width: 100%; border-radius: 10px; }
+        
+        .salary-card { background: white; border-radius: 24px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .salary-card h3 { color: #5D4A36; margin-bottom: 20px; }
+        .salary-value { font-size: 2rem; font-weight: 700; color: #5D4A36; margin: 15px 0; }
+        .salary-period { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-top: 20px; }
+        .salary-period input { padding: 12px 15px; border: 2px solid #e8e0d5; border-radius: 12px; font-size: 1rem; flex: 1; min-width: 150px; }
+        .salary-period input:focus { outline: none; border-color: #8B7355; }
+        .btn-calc { background: #2196F3; color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.3s; margin-right: 10px; }
+        .btn-calc:hover { background: #1976D2; transform: translateY(-2px); }
+        .btn-download { background: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-download:hover { background: #45a049; transform: translateY(-2px); }
+        .salary-result { background: #f8f5f0; border-radius: 16px; padding: 20px; margin-top: 20px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .manager-cabinet { margin-top: 80px; }
+            .manager-header { flex-direction: column; gap: 15px; text-align: center; }
+            .tabs { justify-content: center; }
+            .data-table { font-size: 0.7rem; }
+            .data-table th, .data-table td { padding: 8px; }
+            .burger-menu { display: flex; }
+            .nav-menu { display: none; position: fixed; top: 0; left: -100%; width: 80%; height: 100vh; background: #1a1a1a; flex-direction: column; padding: 70px 20px; gap: 0; }
+            .nav-menu.active { left: 0; display: flex; }
+            .salary-period { flex-direction: column; align-items: stretch; }
+            .modal-buttons { flex-direction: column; }
+            .btn-save, .btn-cancel { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="burger-menu" id="burgerMenu">
+            <span></span><span></span><span></span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Главная</a></li>
+            <li><a href="prices.html" class="nav-link">Цены</a></li>
+            <li><a href="schedule.html" class="nav-link">Расписание</a></li>
+            <li><a href="manager-cabinet.html" class="nav-link">📋 Панель менеджера</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="manager-cabinet">
+    <div class="manager-header">
+        <h1>📋 Панель менеджера</h1>
+        <div>
+            <button class="btn-back" onclick="goToAdmin()" id="backToAdminBtn" style="display: none;">← Назад в админку</button>
+            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="new">🆕 Новые заказы</button>
+        <button class="tab-btn" data-tab="all">📋 Все заказы</button>
+        <button class="tab-btn" data-tab="reports">📸 Отчёты</button>
+        <button class="tab-btn" data-tab="reviews">⭐ Отзывы</button>
+        <button class="tab-btn" data-tab="salary">💰 Моя зарплата</button>
+    </div>
+    
+    <!-- Новые заказы -->
+    <div id="newPanel" class="tab-panel active">
+        <div style="margin-bottom: 20px;">
+            <button class="btn-refresh" onclick="loadNewOrders()">🔄 Обновить</button>
+        </div>
+        <div id="newOrdersContainer">Загрузка...</div>
+    </div>
+    
+    <!-- Все заказы -->
+    <div id="allPanel" class="tab-panel">
+        <div style="margin-bottom: 20px;">
+            <button class="btn-refresh" onclick="loadAllOrders()">🔄 Обновить</button>
+        </div>
+        <div id="allOrdersContainer">Загрузка...</div>
+    </div>
+    
+    <!-- Отчёты -->
+    <div id="reportsPanel" class="tab-panel">
+        <div style="margin-bottom: 20px;">
+            <button class="btn-refresh" onclick="loadAllReports()">🔄 Обновить</button>
+        </div>
+        <div id="reportsContainer">Загрузка...</div>
+    </div>
+    
+    <!-- Отзывы -->
+    <div id="reviewsPanel" class="tab-panel">
+        <div style="margin-bottom: 20px;">
+            <button class="btn-refresh" onclick="loadAllReviews()">🔄 Обновить</button>
+        </div>
+        <div id="reviewsContainer">Загрузка...</div>
+    </div>
+    
+    <!-- Зарплата -->
+    <div id="salaryPanel" class="tab-panel">
+        <div class="salary-card">
+            <h3>💰 Моя зарплата</h3>
+            <div class="salary-value" id="managerSalary">Загрузка...</div>
+            <div class="salary-period">
+                <input type="date" id="salaryStartDate">
+                <input type="date" id="salaryEndDate">
+                <button class="btn-calc" onclick="calculateSalary()">📊 Рассчитать</button>
+                <button class="btn-download" onclick="downloadPayslip()" id="downloadBtn" style="display: none;">📄 Скачать расчётный лист</button>
+            </div>
+            <div id="salaryResult" class="salary-result"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно назначения сотрудника -->
+<div id="assignModal" class="assign-modal">
+    <div class="assign-modal-content">
+        <h3>👨‍🔧 Назначить сотрудника</h3>
+        <input type="hidden" id="assignOrderId">
+        <div id="orderInfo" class="info-text">Загрузка...</div>
+        <div class="form-group">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Выберите сотрудника</label>
+            <select id="assignWorkerId">
+                <option value="">-- Загрузка --</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-save" onclick="assignWorker()">✅ Назначить</button>
+            <button class="btn-cancel" onclick="closeAssignModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для фото -->
+<div id="photoModal" class="photo-modal" onclick="closePhotoModal()">
+    <div class="photo-modal-content" onclick="event.stopPropagation()">
+        <img id="modalPhoto" src="" alt="Фото">
+        <button onclick="closePhotoModal()" style="margin-top: 15px; background: #5D4A36; color: white; border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer;">Закрыть</button>
+    </div>
+</div>
+
+<script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || (user.role !== 'manager' && user.role !== 'admin')) {
+        window.location.href = 'index.html';
+    }
+    
+    let currentPayslipData = null;
+    
+    if (document.referrer.includes('admin-cabinet.html')) {
+        const backBtn = document.getElementById('backToAdminBtn');
+        if (backBtn) backBtn.style.display = 'inline-block';
+    }
+    
+    function goToAdmin() { window.location.href = 'admin-cabinet.html'; }
+    function logout() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    // Установка дат по умолчанию
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    if (document.getElementById('salaryStartDate')) {
+        document.getElementById('salaryStartDate').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('salaryEndDate').value = lastDay.toISOString().split('T')[0];
+    }
+    
+    // ========== ЗАРПЛАТА МЕНЕДЖЕРА ==========
+    async function loadSalary() {
+        try {
+            const res = await fetch(`/api/salary/manager/${user.id}`);
+            const data = await res.json();
+            const salary = data.monthly_salary || 50000;
+            document.getElementById('managerSalary').innerHTML = salary.toLocaleString() + ' ₽/мес';
+        } catch(e) {
+            console.error(e);
+            document.getElementById('managerSalary').innerHTML = 'Ошибка';
+        }
+    }
+    
+    async function calculateSalary() {
+        const startDate = document.getElementById('salaryStartDate').value;
+        const endDate = document.getElementById('salaryEndDate').value;
+        
+        if (!startDate || !endDate) {
+            alert('Выберите период');
+            return;
+        }
+        
+        const btn = document.querySelector('#salaryPanel .btn-calc');
+        btn.disabled = true;
+        btn.textContent = 'Расчёт...';
+        
+        try {
+            const res = await fetch(`/api/salary/manager/${user.id}/period?startDate=${startDate}&endDate=${endDate}`);
+            const data = await res.json();
+            
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            document.getElementById('salaryResult').innerHTML = `
+                <div style="padding: 15px;">
+                    <p><strong>📅 Период:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+                    <p><strong>💰 Оклад:</strong> ${data.monthly_salary.toLocaleString()} ₽</p>
+                    <p><strong>🎁 Премия:</strong> ${data.bonus.toLocaleString()} ₽</p>
+                    <p><strong>📊 Рабочих дней:</strong> ${data.period.workDays} дней</p>
+                    <p><strong>💵 Заработная плата за период:</strong> ${data.salary_for_period.toLocaleString()} ₽</p>
+                    <p style="margin-top: 10px;"><strong>💸 НДФЛ (13%):</strong> ${data.tax.toLocaleString()} ₽</p>
+                    <p style="font-size: 1.3rem; font-weight: 700; color: #4CAF50; margin-top: 15px;">💵 Итого к выплате: ${data.net_salary.toLocaleString()} ₽</p>
+                </div>
+            `;
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+            
+            currentPayslipData = { startDate, endDate, data, userName: user.name };
+            
+        } catch(e) {
+            console.error(e);
+            alert('Ошибка расчёта: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '📊 Рассчитать';
+        }
+    }
+    
+    async function downloadPayslip() {
+        if (!currentPayslipData) {
+            alert('Сначала рассчитайте зарплату');
+            return;
+        }
+        
+        const d = currentPayslipData.data;
+        const html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Расчётный лист - ${escapeHtml(currentPayslipData.userName)}</title>
+            <style>
+                body { font-family: 'Inter', sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; }
+                h1 { color: #5D4A36; text-align: center; }
+                .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e8e0d5; padding-bottom: 15px; }
+                .info { background: #f8f5f0; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+                .total { font-size: 1.3rem; font-weight: bold; text-align: right; margin-top: 20px; padding-top: 15px; border-top: 2px solid #5D4A36; }
+                .footer { text-align: center; margin-top: 40px; color: #999; font-size: 0.8rem; }
+            </style>
+        </head>
+        <body>
+            <h1>Расчётный лист</h1>
+            <div class="header">
+                <p>ООО "Чистый дом"</p>
+                <p>Период: ${new Date(currentPayslipData.startDate).toLocaleDateString()} - ${new Date(currentPayslipData.endDate).toLocaleDateString()}</p>
+            </div>
+            <div class="info">
+                <p><strong>Сотрудник:</strong> ${escapeHtml(currentPayslipData.userName)}</p>
+                <p><strong>Должность:</strong> Менеджер</p>
+                <p><strong>Оклад:</strong> ${d.monthly_salary.toLocaleString()} ₽</p>
+                <p><strong>Премия:</strong> ${d.bonus.toLocaleString()} ₽</p>
+                <p><strong>Рабочих дней в периоде:</strong> ${d.period.workDays} дней</p>
+                <p><strong>Заработная плата за период:</strong> ${d.salary_for_period.toLocaleString()} ₽</p>
+            </div>
+            <div class="total">
+                <p>Начислено: ${d.total_salary.toLocaleString()} ₽</p>
+                <p>НДФЛ (13%): ${d.tax.toLocaleString()} ₽</p>
+                <p style="font-size: 1.5rem; color: #4CAF50;">Итого к выплате: ${d.net_salary.toLocaleString()} ₽</p>
+            </div>
+            <div class="footer">
+                <p>Расчётный лист сформирован автоматически</p>
+                <p>Дата: ${new Date().toLocaleDateString()}</p>
+            </div>
+        </body>
+        </html>`;
+        
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `payslip_${currentPayslipData.userName}_${currentPayslipData.startDate}_${currentPayslipData.endDate}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    // ========== НОВЫЕ ЗАКАЗЫ ==========
+    async function loadNewOrders() {
+        try {
+            const res = await fetch('/api/orders/new-orders');
+            const orders = await res.json();
+            const container = document.getElementById('newOrdersContainer');
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px;">✨ Нет новых заказов</div>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr>';
+            html += '<th>ID</th><th>Клиент</th><th>Телефон</th><th>Адрес</th><th>Дата</th><th>Время</th><th>Сумма</th><th>Действия</th>';
+            html += '</tr></thead><tbody>';
+            
+            for (const order of orders) {
+                html += `<tr>
+                    <td>${order.id}</td>
+                    <td>${escapeHtml(order.client_name)}</td>
+                    <td>${escapeHtml(order.client_phone)}</td>
+                    <td>${escapeHtml(order.address)}</td>
+                    <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                    <td>${order.time_slot || '09:00'}</td>
+                    <td>${order.total_price} ₽</td>
+                    <td><button class="btn-assign" onclick="openAssignModal(${order.id})">👨‍🔧 Назначить</button></td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) {
+            console.error(e);
+            document.getElementById('newOrdersContainer').innerHTML = '<p style="color:red;">Ошибка загрузки</p>';
+        }
+    }
+    
+    // ========== ВСЕ ЗАКАЗЫ ==========
+    async function loadAllOrders() {
+        try {
+            const res = await fetch('/api/orders/all-orders');
+            const orders = await res.json();
+            const container = document.getElementById('allOrdersContainer');
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px;">📭 Нет заказов</div>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr>';
+            html += '<th>ID</th><th>Клиент</th><th>Адрес</th><th>Дата</th><th>Статус</th><th>Сотрудники</th><th>Действия</th>';
+            html += '</tr></thead><tbody>';
+            
+            for (const order of orders) {
+                let statusClass = '', statusText = '';
+                if (order.status === 'new') { statusClass = 'badge-new'; statusText = '🆕 Новый'; }
+                else if (order.status === 'in_progress') { statusClass = 'badge-progress'; statusText = '🔄 В работе'; }
+                else { statusClass = 'badge-completed'; statusText = '✅ Выполнен'; }
+                
+                let workersHtml = '';
+                if (order.workers && order.workers.length > 0 && order.workers[0]) {
+                    workersHtml = order.workers.map(w => `<span style="background:#f0e9e0; padding:2px 8px; border-radius:12px; margin:2px; display:inline-block;">${escapeHtml(w)}</span>`).join('');
+                } else {
+                    workersHtml = '<span style="color:#999;">Не назначен</span>';
+                }
+                
+                html += `<tr>
+                    <td>${order.id}</td>
+                    <td>${escapeHtml(order.client_name)}</td>
+                    <td>${escapeHtml(order.address)}</td>
+                    <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>${workersHtml}</td>
+                    <td><button class="btn-view" onclick="viewOrderDetails(${order.id})">📋 Детали</button></td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) {
+            console.error(e);
+            document.getElementById('allOrdersContainer').innerHTML = '<p style="color:red;">Ошибка загрузки</p>';
+        }
+    }
+    
+    // ========== ОТЧЁТЫ ==========
+    async function loadAllReports() {
+        try {
+            const res = await fetch('/api/reports/all');
+            const reports = await res.json();
+            const container = document.getElementById('reportsContainer');
+            
+            if (!reports || reports.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px;">📸 Нет отчётов</div>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr>';
+            html += '<th>ID</th><th>Сотрудник</th><th>Заказ</th><th>Адрес</th><th>Дата</th><th>Комментарий</th><th>Фото</th>';
+            html += '</tr></thead><tbody>';
+            
+            for (const r of reports) {
+                let photos = '';
+                if (r.before_photo_url) photos += `<img src="${r.before_photo_url}" class="photo-thumb" onclick="showPhoto('${r.before_photo_url}')" title="Фото до"> `;
+                if (r.after_photo_url) photos += `<img src="${r.after_photo_url}" class="photo-thumb" onclick="showPhoto('${r.after_photo_url}')" title="Фото после"> `;
+                if (!photos) photos = '-';
+                
+                html += `<tr>
+                    <td>${r.id}</td>
+                    <td>${escapeHtml(r.worker_name)}</td>
+                    <td>${r.order_id || '-'}</td>
+                    <td>${escapeHtml(r.address || '-')}</td>
+                    <td>${new Date(r.shift_date).toLocaleDateString()}</td>
+                    <td>${escapeHtml(r.comment || '-')}</td>
+                    <td>${photos}</td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) {
+            console.error(e);
+            document.getElementById('reportsContainer').innerHTML = '<p style="color:red;">Ошибка загрузки</p>';
+        }
+    }
+    
+    // ========== ОТЗЫВЫ ==========
+    async function loadAllReviews() {
+        try {
+            const res = await fetch('/api/reviews');
+            const reviews = await res.json();
+            const container = document.getElementById('reviewsContainer');
+            
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px;">⭐ Нет отзывов</div>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr>';
+            html += '<th>ID</th><th>Заказ</th><th>Оценка</th><th>Отзыв</th><th>Дата</th><th>Ответ</th>';
+            html += '</tr></thead><tbody>';
+            
+            for (const r of reviews) {
+                html += `<tr>
+                    <td>${r.id}</td>
+                    <td>#${r.order_id}</td>
+                    <td><div class="stars-display">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div></td>
+                    <td>${escapeHtml(r.comment || '-')}</td>
+                    <td>${new Date(r.created_at).toLocaleDateString()}</td>
+                    <td>
+                        ${r.admin_reply ? escapeHtml(r.admin_reply) : '<span style="color:#999;">Нет ответа</span>'}
+                        <button class="btn-reply" onclick="replyToReview(${r.id})" style="margin-top:5px; display:block;">💬 Ответить</button>
+                    </td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) {
+            console.error(e);
+            document.getElementById('reviewsContainer').innerHTML = '<p style="color:red;">Ошибка загрузки</p>';
+        }
+    }
+    
+    async function replyToReview(reviewId) {
+        const reply = prompt('Введите ответ на отзыв:');
+        if (reply && reply.trim()) {
+            try {
+                const res = await fetch(`/api/reviews/${reviewId}/reply`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_reply: reply })
+                });
+                const data = await res.json();
+                if (data.id) {
+                    alert('✅ Ответ добавлен!');
+                    loadAllReviews();
+                } else {
+                    alert('❌ Ошибка');
+                }
+            } catch(e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+    }
+    
+    // ========== НАЗНАЧЕНИЕ СОТРУДНИКА ==========
+    async function loadWorkersForAssign() {
+        try {
+            const res = await fetch('/api/workers/list');
+            const workers = await res.json();
+            const select = document.getElementById('assignWorkerId');
+            if (select && workers) {
+                select.innerHTML = '<option value="">-- Выберите сотрудника --</option>' + 
+                    workers.map(w => `<option value="${w.id}">${escapeHtml(w.full_name)}</option>`).join('');
+            }
+        } catch(e) { console.error(e); }
+    }
+    
+    async function openAssignModal(orderId) {
+        document.getElementById('assignOrderId').value = orderId;
+        document.getElementById('orderInfo').innerHTML = 'Загрузка...';
+        document.getElementById('assignModal').classList.add('active');
+        
+        try {
+            const res = await fetch(`/api/orders/details/${orderId}`);
+            const data = await res.json();
+            const orderRes = await fetch('/api/orders/all-orders');
+            const orders = await orderRes.json();
+            const order = orders.find(o => o.id == orderId);
+            
+            if (order) {
+                document.getElementById('orderInfo').innerHTML = `
+                    📅 Дата: ${new Date(order.order_date).toLocaleDateString()}<br>
+                    ⏰ Время: ${order.time_slot || '09:00'}<br>
+                    📍 Адрес: ${escapeHtml(order.address)}<br>
+                    💰 Сумма: ${order.total_price} ₽
+                `;
+            } else {
+                document.getElementById('orderInfo').innerHTML = 'Информация о заказе не найдена';
+            }
+        } catch(e) {
+            console.error(e);
+            document.getElementById('orderInfo').innerHTML = 'Ошибка загрузки';
+        }
+        
+        loadWorkersForAssign();
+    }
+    
+    function closeAssignModal() {
+        document.getElementById('assignModal').classList.remove('active');
+    }
+    
+    async function assignWorker() {
+        const orderId = document.getElementById('assignOrderId').value;
+        const workerId = document.getElementById('assignWorkerId').value;
+        
+        if (!workerId) { alert('Выберите сотрудника'); return; }
+        
+        const assignBtn = document.querySelector('.btn-save');
+        assignBtn.disabled = true;
+        assignBtn.textContent = 'Назначение...';
+        
+        try {
+            const res = await fetch('/api/orders/assign-worker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_id: parseInt(orderId), worker_id: parseInt(workerId) })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert('✅ Сотрудник назначен!');
+                closeAssignModal();
+                await loadNewOrders();
+                await loadAllOrders();
+            } else {
+                alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+            }
+        } catch(e) {
+            alert('Ошибка: ' + e.message);
+        } finally {
+            assignBtn.disabled = false;
+            assignBtn.textContent = '✅ Назначить';
+        }
+    }
+    
+    async function viewOrderDetails(orderId) {
+        try {
+            const res = await fetch(`/api/orders/details/${orderId}`);
+            const data = await res.json();
+            
+            let msg = `Заказ #${orderId}\n\n`;
+            msg += `Услуги: ${data.services.map(s => s.service_name).join(', ')}\n\n`;
+            
+            if (data.workers && data.workers.length > 0) {
+                msg += `Сотрудники:\n`;
+                data.workers.forEach(w => {
+                    msg += `- ${w.full_name}: ${w.shift_date} ${w.start_time}-${w.end_time}\n`;
+                });
+            }
+            alert(msg);
+        } catch(e) {
+            alert('Ошибка загрузки деталей');
+        }
+    }
+    
+    function showPhoto(url) {
+        const modal = document.getElementById('photoModal');
+        document.getElementById('modalPhoto').src = url;
+        modal.classList.add('active');
+    }
+    
+    function closePhotoModal() {
+        document.getElementById('photoModal').classList.remove('active');
+    }
+    
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            const tabId = btn.dataset.tab;
+            document.getElementById(tabId + 'Panel').classList.add('active');
+            
+            if (tabId === 'new') loadNewOrders();
+            if (tabId === 'all') loadAllOrders();
+            if (tabId === 'reports') loadAllReports();
+            if (tabId === 'reviews') loadAllReviews();
+        });
+    });
+    
+    loadNewOrders();
+    loadAllOrders();
+    loadAllReports();
+    loadAllReviews();
+    loadSalary();
+    
+    const burger = document.getElementById('burgerMenu');
+    const menu = document.getElementById('navMenu');
+    if (burger && menu) {
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            menu.classList.toggle('active');
+        });
+    }
+</script>
+</body>
+</html>

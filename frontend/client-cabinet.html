@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Чистый дом</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f8f9fa 0%, #f0e9e0 100%); min-height: 100vh; }
+        
+        .client-cabinet { max-width: 1200px; margin: 100px auto 40px; padding: 0 20px; }
+        .client-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; background: white; padding: 20px 30px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .client-header h1 { color: #5D4A36; font-size: 1.8rem; }
+        .client-info { color: #666; margin-top: 5px; font-size: 0.9rem; }
+        
+        .btn-logout { background: #cc0000; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; transition: all 0.3s; }
+        .btn-logout:hover { background: #990000; transform: translateY(-2px); }
+        .btn-refresh { background: #8B7355; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .btn-refresh:hover { background: #5D4A36; transform: translateY(-2px); }
+        .btn-cache { background: #2196F3; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .btn-cache:hover { background: #1976D2; transform: translateY(-2px); }
+        
+        .tabs { display: flex; gap: 15px; border-bottom: 2px solid #e8e0d5; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 25px; background: none; border: none; font-size: 1rem; cursor: pointer; color: #666; border-radius: 30px 30px 0 0; transition: 0.3s; }
+        .tab-btn:hover { background: #f8f5f0; color: #5D4A36; }
+        .tab-btn.active { color: #5D4A36; border-bottom: 3px solid #5D4A36; font-weight: 600; }
+        .tab-panel { display: none; animation: fadeIn 0.3s; }
+        .tab-panel.active { display: block; }
+        
+        .order-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: all 0.3s; cursor: pointer; }
+        .order-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(93,74,54,0.1); }
+        .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e8e0d5; }
+        .order-id { font-weight: 600; color: #5D4A36; }
+        .order-status { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .status-new { background: #e3f2fd; color: #1976d2; }
+        .status-completed { background: #e8f5e9; color: #388e3c; }
+        .status-cancelled { background: #ffebee; color: #f44336; }
+        .status-in-progress { background: #fff3e0; color: #ff9800; }
+        
+        .order-details { margin-top: 15px; padding-top: 15px; border-top: 1px solid #e8e0d5; display: none; }
+        .order-details.show { display: block; animation: slideDown 0.3s; }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .services-list { background: #f8f5f0; border-radius: 12px; padding: 15px; margin: 10px 0; }
+        .service-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8e0d5; }
+        .service-item:last-child { border-bottom: none; }
+        
+        .review-section { background: #f8f5f0; border-radius: 12px; padding: 15px; margin-top: 15px; }
+        .rating-select { display: flex; gap: 10px; margin: 10px 0; }
+        .star-rating { font-size: 2rem; cursor: pointer; color: #ddd; transition: color 0.2s; }
+        .star-rating:hover, .star-rating.active { color: #FFD700; }
+        .review-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; margin: 10px 0; font-family: inherit; resize: vertical; }
+        .btn-submit-review { background: #5D4A36; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .btn-submit-review:hover { background: #8B7355; }
+        
+        .admin-reply { background: #e8f5e9; border-radius: 12px; padding: 12px; margin-top: 10px; border-left: 4px solid #4CAF50; }
+        .admin-reply strong { color: #388e3c; }
+        
+        .report-card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; border: 1px solid #e8e0d5; }
+        .report-photo { max-width: 100%; border-radius: 12px; margin-top: 10px; cursor: pointer; }
+        
+        .existing-review { background: #e8f5e9; border-radius: 12px; padding: 15px; margin-top: 15px; border-left: 4px solid #4CAF50; }
+        .existing-review .stars { font-size: 1.3rem; margin-bottom: 10px; }
+        .review-thanks { color: #388e3c; font-weight: 500; margin-bottom: 10px; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 30px; padding: 25px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content img { max-width: 100%; border-radius: 12px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .client-cabinet { margin-top: 80px; }
+            .client-header { flex-direction: column; gap: 15px; text-align: center; }
+            .tabs { justify-content: center; }
+            .order-header { flex-direction: column; align-items: flex-start; }
+            .star-rating { font-size: 1.5rem; }
+            .btn-cache, .btn-refresh { margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+
+<div class="client-cabinet">
+    <div class="client-header">
+        <div>
+            <h1>👤 Личный кабинет</h1>
+            <div class="client-info" id="clientInfo">Загрузка...</div>
+        </div>
+        <div>
+            <button class="btn-cache" onclick="clearCacheAndReload()">🗑️ Очистить кэш</button>
+            <button class="btn-refresh" onclick="loadOrders()">🔄 Обновить</button>
+            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="orders">📦 Мои заказы</button>
+        <button class="tab-btn" data-tab="reviews">⭐ Мои отзывы</button>
+    </div>
+    
+    <!-- Заказы -->
+    <div id="ordersPanel" class="tab-panel active">
+        <div id="ordersContainer">Загрузка заказов...</div>
+    </div>
+    
+    <!-- Мои отзывы -->
+    <div id="reviewsPanel" class="tab-panel">
+        <div id="myReviewsContainer">Загрузка...</div>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<!-- Модальное окно для фото -->
+<div id="photoModal" class="modal-overlay" onclick="closePhotoModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <img id="modalPhoto" src="" alt="Фото отчёта">
+        <button onclick="closePhotoModal()" style="margin-top: 15px; background: #5D4A36; color: white; border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer;">Закрыть</button>
+    </div>
+</div>
+
+<script src="components/loader.js"></script>
+<script>
+    // Проверка авторизации
+    let currentClient = JSON.parse(localStorage.getItem('client'));
+    if (!currentClient) {
+        window.location.href = 'index.html';
+    }
+    
+    const clientName = currentClient.name || currentClient.full_name || 'Клиент';
+    document.getElementById('clientInfo').innerHTML = `${escapeHtml(clientName)}<br>📞 ${escapeHtml(currentClient.phone)}`;
+    
+    // Очистка кэша и перезагрузка
+    async function clearCacheAndReload() {
+        try {
+            const res = await fetch('/api/cache/clear', { method: 'POST' });
+            if (res.ok) {
+                if (window.apiCache) window.apiCache.clear();
+                alert('✅ Кэш очищен');
+                loadOrders();
+                loadMyReviews();
+            } else {
+                alert('❌ Ошибка очистки кэша');
+            }
+        } catch(e) {
+            console.error(e);
+            location.reload();
+        }
+    }
+    
+    // Переключение вкладок
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab + 'Panel').classList.add('active');
+            
+            if (btn.dataset.tab === 'reviews') {
+                loadMyReviews();
+            }
+        };
+    });
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    // Загрузка заказов
+    async function loadOrders() {
+        try {
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const res = await fetch(`/api/orders/client-id/${currentClient.id}`);
+            if (!res.ok) throw new Error('Ошибка загрузки');
+            const orders = await res.json();
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px;">🤷 У вас пока нет заказов<br><br><a href="prices.html" class="btn-add" style="display:inline-block;">Сделать первый заказ</a></div>';
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => `
+                <div class="order-card" onclick="toggleOrderDetails(${order.id})">
+                    <div class="order-header">
+                        <span class="order-id">📋 Заказ #${order.id}</span>
+                        <span class="order-date">📅 ${new Date(order.order_date).toLocaleDateString()}</span>
+                        <span class="order-status status-${order.status === 'completed' ? 'completed' : order.status === 'cancelled' ? 'cancelled' : order.status === 'in_progress' ? 'in-progress' : 'new'}">
+                            ${order.status === 'completed' ? '✅ Выполнен' : order.status === 'cancelled' ? '❌ Отменён' : order.status === 'in_progress' ? '🔄 В работе' : '🆕 Новый'}
+                        </span>
+                    </div>
+                    <div><strong>📍 Адрес:</strong> ${escapeHtml(order.address)}</div>
+                    <div><strong>💰 Сумма:</strong> ${order.total_price || 0} ₽</div>
+                    <div class="order-details" id="details-${order.id}">
+                        <div id="details-content-${order.id}">Загрузка деталей...</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            for (const order of orders) {
+                loadOrderDetails(order.id, order.status);
+            }
+            
+        } catch(e) {
+            console.error(e);
+            document.getElementById('ordersContainer').innerHTML = '<p style="color:red;">Ошибка загрузки заказов</p>';
+        }
+    }
+    
+    async function loadOrderDetails(orderId, orderStatus) {
+        try {
+            const res = await fetch(`/api/orders/details/${orderId}`);
+            if (!res.ok) throw new Error('Ошибка');
+            const data = await res.json();
+            
+            const detailsDiv = document.getElementById(`details-content-${orderId}`);
+            if (!detailsDiv) return;
+            
+            // Услуги
+            let servicesHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong>🧹 Услуги:</strong>';
+            if (data.services && data.services.length > 0) {
+                data.services.forEach(s => {
+                    servicesHtml += `<div class="service-item" onclick="event.stopPropagation()"><span>${escapeHtml(s.service_name)}</span><span>${s.price} ₽</span></div>`;
+                });
+            } else {
+                servicesHtml += '<div class="service-item" onclick="event.stopPropagation()">Нет данных</div>';
+            }
+            servicesHtml += '</div>';
+            
+            // Сотрудники
+            let workersHtml = '';
+            if (data.workers && data.workers.length > 0) {
+                workersHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong>👨‍🔧 Исполнители:</strong>';
+                data.workers.forEach(w => {
+                    workersHtml += `<div class="service-item" onclick="event.stopPropagation()"><span>${escapeHtml(w.full_name)}</span><span>${w.shift_date ? new Date(w.shift_date).toLocaleDateString() : ''}</span></div>`;
+                });
+                workersHtml += '</div>';
+            }
+            
+            // Отчёты
+            let reportsHtml = '';
+            if (data.reports && data.reports.length > 0) {
+                reportsHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong>📸 Отчёты по работе:</strong>';
+                data.reports.forEach(r => {
+                    reportsHtml += `
+                        <div class="report-card" onclick="event.stopPropagation()">
+                            <div><strong>👤 Сотрудник:</strong> ${escapeHtml(r.worker_name)}</div>
+                            <div><strong>📅 Дата:</strong> ${new Date(r.shift_date).toLocaleDateString()}</div>
+                            <div><strong>💬 Комментарий:</strong> ${escapeHtml(r.comment || 'Без комментария')}</div>
+                            ${r.before_photo_url ? `<img loading="lazy" src="${r.before_photo_url}" class="report-photo" onclick="event.stopPropagation(); showPhoto('${r.before_photo_url}')">` : ''}
+                            ${r.after_photo_url ? `<img loading="lazy" src="${r.after_photo_url}" class="report-photo" onclick="event.stopPropagation(); showPhoto('${r.after_photo_url}')">` : ''}
+                        </div>
+                    `;
+                });
+                reportsHtml += '</div>';
+            }
+            
+            // Проверяем есть ли уже отзыв
+            let existingReview = null;
+            try {
+                const reviewRes = await fetch(`/api/reviews/check?order_id=${orderId}&client_id=${currentClient.id}`);
+                if (reviewRes.ok) {
+                    existingReview = await reviewRes.json();
+                }
+            } catch(e) {}
+            
+            let reviewHtml = '';
+            
+            if (orderStatus === 'completed') {
+                if (existingReview && existingReview.id) {
+                    reviewHtml = `
+                        <div class="existing-review" onclick="event.stopPropagation()">
+                            <div class="review-thanks">✅ Спасибо за ваш отзыв!</div>
+                            <div class="stars" style="font-size:1.3rem;">${'★'.repeat(existingReview.rating)}${'☆'.repeat(5 - existingReview.rating)}</div>
+                            <p><strong>💬 Ваш отзыв:</strong> "${escapeHtml(existingReview.comment)}"</p>
+                            ${existingReview.admin_reply ? `
+                                <div class="admin-reply" onclick="event.stopPropagation()">
+                                    <strong>👑 Ответ администратора:</strong><br>
+                                    ${escapeHtml(existingReview.admin_reply)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                } else if (data.workers && data.workers.length > 0) {
+                    const worker = data.workers[0];
+                    reviewHtml = `
+                        <div class="review-section" id="review-form-${orderId}" onclick="event.stopPropagation()">
+                            <strong>⭐ Оцените качество работы:</strong>
+                            <div class="rating-select" id="rating-${orderId}" onclick="event.stopPropagation()">
+                                ${[1,2,3,4,5].map(star => `<span class="star-rating" data-value="${star}" onclick="event.stopPropagation(); setRating(${orderId}, ${star}, ${worker.id})">★</span>`).join('')}
+                            </div>
+                            <textarea id="review-text-${orderId}" class="review-textarea" rows="3" placeholder="Поделитесь впечатлениями о работе..." onclick="event.stopPropagation()" onfocus="event.stopPropagation()"></textarea>
+                            <button class="btn-submit-review" onclick="event.stopPropagation(); submitReview(${orderId}, ${worker.id})">📝 Отправить отзыв</button>
+                        </div>
+                    `;
+                }
+            }
+            
+            detailsDiv.innerHTML = servicesHtml + workersHtml + reportsHtml + reviewHtml;
+            
+        } catch(e) {
+            console.error(e);
+            const detailsDiv = document.getElementById(`details-content-${orderId}`);
+            if (detailsDiv) detailsDiv.innerHTML = '<p style="color:red;">Ошибка загрузки деталей</p>';
+        }
+    }
+    
+    let selectedRating = { value: null, orderId: null, workerId: null };
+    
+    function setRating(orderId, rating, workerId) {
+        selectedRating.value = rating;
+        selectedRating.orderId = orderId;
+        selectedRating.workerId = workerId;
+        
+        const container = document.getElementById(`rating-${orderId}`);
+        if (container) {
+            const stars = container.querySelectorAll('.star-rating');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                    star.style.color = '#FFD700';
+                } else {
+                    star.classList.remove('active');
+                    star.style.color = '#ddd';
+                }
+            });
+        }
+    }
+    
+    async function submitReview(orderId, workerId) {
+        const rating = selectedRating.value;
+        const comment = document.getElementById(`review-text-${orderId}`).value;
+        
+        if (!rating) {
+            alert('Пожалуйста, поставьте оценку');
+            return;
+        }
+        
+        const submitBtn = document.querySelector(`#review-form-${orderId} .btn-submit-review`);
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Отправка...';
+        }
+        
+        try {
+            const res = await fetch('/api/orders/review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    order_id: parseInt(orderId),
+                    client_id: currentClient.id,
+                    worker_id: parseInt(workerId),
+                    rating: parseInt(rating),
+                    comment: comment || ''
+                })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert('✅ Спасибо за ваш отзыв!');
+                loadOrderDetails(orderId, 'completed');
+                if (document.querySelector('.tab-btn.active').dataset.tab === 'reviews') {
+                    loadMyReviews();
+                }
+                selectedRating.value = null;
+            } else {
+                alert('❌ Ошибка: ' + (data.error || 'Не удалось отправить отзыв'));
+            }
+        } catch(e) {
+            console.error(e);
+            alert('Ошибка соединения');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📝 Отправить отзыв';
+            }
+        }
+    }
+    
+    function toggleOrderDetails(orderId) {
+        const details = document.getElementById(`details-${orderId}`);
+        if (details) {
+            details.classList.toggle('show');
+        }
+    }
+    
+    async function loadMyReviews() {
+        try {
+            const res = await fetch('/api/reviews');
+            if (!res.ok) throw new Error('Ошибка');
+            const allReviews = await res.json();
+            const reviews = allReviews.filter(r => r.client_id === currentClient.id);
+            
+            const container = document.getElementById('myReviewsContainer');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px;">⭐ У вас пока нет отзывов<br><br>Оставьте отзыв после выполнения заказа</div>';
+                return;
+            }
+            
+            container.innerHTML = reviews.map(r => `
+                <div class="order-card" onclick="toggleOrderDetails(${r.order_id})">
+                    <div class="order-header">
+                        <span class="order-id">📋 Заказ #${r.order_id}</span>
+                        <span class="order-date">📅 ${new Date(r.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="stars" style="font-size:1.3rem; margin: 10px 0;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                    <p><strong>💬 Ваш отзыв:</strong> "${escapeHtml(r.comment)}"</p>
+                    ${r.admin_reply ? `
+                        <div class="admin-reply">
+                            <strong>👑 Ответ администратора:</strong><br>
+                            ${escapeHtml(r.admin_reply)}
+                        </div>
+                    ` : '<p style="color:#999; margin-top:10px;">Ответ администратора появится позже</p>'}
+                </div>
+            `).join('');
+        } catch(e) {
+            console.error(e);
+            document.getElementById('myReviewsContainer').innerHTML = '<p style="color:red;">Ошибка загрузки отзывов</p>';
+        }
+    }
+    
+    function showPhoto(url) {
+        const modal = document.getElementById('photoModal');
+        const img = document.getElementById('modalPhoto');
+        img.src = url;
+        modal.classList.add('active');
+    }
+    
+    function closePhotoModal() {
+        const modal = document.getElementById('photoModal');
+        modal.classList.remove('active');
+    }
+    
+    function logout() {
+        localStorage.removeItem('client');
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('totalPrice');
+        window.location.href = 'index.html';
+    }
+    
+    loadOrders();
+    
+    // Бургер-меню
+    const burger = document.getElementById('burgerMenu');
+    const menu = document.getElementById('navMenu');
+    if (burger && menu) {
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            menu.classList.toggle('active');
+        });
+    }
+</script>
+</body>
+</html>

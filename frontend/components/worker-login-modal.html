@@ -1,0 +1,262 @@
+<!-- components/worker-login-modal.html -->
+<div id="workerModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" id="closeWorkerModal">&times;</button>
+        
+        <h2 style="color: #5D4A36; margin-bottom: 20px; text-align: center;">👨‍💼 Вход для сотрудников</h2>
+        
+        <!-- Форма входа -->
+        <div id="workerLoginForm" class="worker-modal-form">
+            <div class="form-group">
+                <label>Роль</label>
+                <select id="roleSelect" class="worker-input">
+                    <option value="">-- Выберите роль --</option>
+                    <option value="admin">👑 Администратор</option>
+                    <option value="manager">📋 Менеджер</option>
+                    <option value="worker">🧹 Сотрудник</option>
+                </select>
+            </div>
+            
+            <div id="employeeGroup" style="display: none;">
+                <div class="form-group">
+                    <label>Сотрудник</label>
+                    <select id="employeeSelect" class="worker-input">
+                        <option value="">-- Загрузка... --</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="workerPassword" class="worker-input" placeholder="Введите пароль">
+            </div>
+            
+            <button id="submitWorkerLogin" class="worker-submit-btn">Войти</button>
+            
+            <div id="workerLoginError" class="error-msg"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.worker-modal-form .form-group {
+    margin-bottom: 20px;
+}
+.worker-modal-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+.worker-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e8e0d5;
+    border-radius: 12px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+.worker-input:focus {
+    outline: none;
+    border-color: #8B7355;
+}
+.worker-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #5D4A36;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+.worker-submit-btn:hover {
+    background: #8B7355;
+    transform: translateY(-2px);
+}
+.error-msg {
+    color: #f44336;
+    font-size: 0.85rem;
+    margin-top: 12px;
+    text-align: center;
+    display: none;
+}
+</style>
+
+<script>
+(function() {
+    console.log('🔧 Инициализация модалки сотрудников');
+    
+    let workersList = [];
+    
+    async function loadWorkersList() {
+        try {
+            const response = await fetch('/api/workers/list');
+            if (response.ok) {
+                workersList = await response.json();
+                console.log('Загружено сотрудников:', workersList.length);
+            } else {
+                console.error('Ошибка загрузки, статус:', response.status);
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки сотрудников:', error);
+            workersList = [];
+        }
+    }
+    
+    function initWorkerModal() {
+        const modal = document.getElementById('workerModal');
+        const closeBtn = document.getElementById('closeWorkerModal');
+        const roleSelect = document.getElementById('roleSelect');
+        const employeeGroup = document.getElementById('employeeGroup');
+        const employeeSelect = document.getElementById('employeeSelect');
+        const submitBtn = document.getElementById('submitWorkerLogin');
+        const passwordInput = document.getElementById('workerPassword');
+        const errorDiv = document.getElementById('workerLoginError');
+        
+        window.openWorkerModal = function() {
+            if (modal) {
+                if (roleSelect) roleSelect.value = '';
+                if (employeeGroup) employeeGroup.style.display = 'none';
+                if (employeeSelect) employeeSelect.innerHTML = '<option value="">-- Выберите сотрудника --</option>';
+                if (passwordInput) passwordInput.value = '';
+                if (errorDiv) errorDiv.style.display = 'none';
+                modal.classList.add('active');
+            }
+        };
+        
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                if (modal) modal.classList.remove('active');
+            };
+        }
+        
+        if (modal) {
+            modal.onclick = function(e) {
+                if (e.target === modal) modal.classList.remove('active');
+            };
+        }
+        
+        if (roleSelect) {
+            roleSelect.onchange = function() {
+                const role = this.value;
+                
+                if (role === 'worker') {
+                    if (employeeGroup) employeeGroup.style.display = 'block';
+                    if (workersList.length === 0) {
+                        loadWorkersList().then(() => {
+                            updateEmployeeSelect();
+                        });
+                    } else {
+                        updateEmployeeSelect();
+                    }
+                } else {
+                    if (employeeGroup) employeeGroup.style.display = 'none';
+                }
+                
+                if (passwordInput) passwordInput.value = '';
+                if (errorDiv) errorDiv.style.display = 'none';
+            };
+        }
+        
+        function updateEmployeeSelect() {
+            if (employeeSelect) {
+                if (workersList.length === 0) {
+                    employeeSelect.innerHTML = '<option value="">-- Нет сотрудников --</option>';
+                } else {
+                    employeeSelect.innerHTML = '<option value="">-- Выберите сотрудника --</option>' +
+                        workersList.map(w => `<option value="${w.id}|${w.phone}">${escapeHtml(w.full_name)}</option>`).join('');
+                }
+            }
+        }
+        
+        if (submitBtn) {
+            submitBtn.onclick = async function() {
+                const role = roleSelect ? roleSelect.value : '';
+                const password = passwordInput ? passwordInput.value : '';
+                
+                if (!role) {
+                    showWorkerError(errorDiv, 'Выберите роль');
+                    return;
+                }
+                if (!password) {
+                    showWorkerError(errorDiv, 'Введите пароль');
+                    return;
+                }
+                
+                let phone = null;
+                if (role === 'worker') {
+                    const selected = employeeSelect ? employeeSelect.value : '';
+                    if (!selected) {
+                        showWorkerError(errorDiv, 'Выберите сотрудника');
+                        return;
+                    }
+                    phone = selected.split('|')[1];
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Вход...';
+                if (errorDiv) errorDiv.style.display = 'none';
+                
+                try {
+                    const response = await fetch('/api/auth/worker-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ role, phone, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        alert(`Добро пожаловать, ${data.user.name}!`);
+                        if (modal) modal.classList.remove('active');
+                        
+                        if (data.user.role === 'admin') {
+                            window.location.href = 'admin-cabinet.html';
+                        } else if (data.user.role === 'manager') {
+                            window.location.href = 'manager-cabinet.html';
+                        } else if (data.user.role === 'worker') {
+                            window.location.href = 'worker-cabinet.html';
+                        }
+                    } else {
+                        showWorkerError(errorDiv, data.error || 'Ошибка входа');
+                    }
+                } catch (error) {
+                    showWorkerError(errorDiv, 'Ошибка соединения с сервером');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Войти';
+                }
+            };
+        }
+        
+        function showWorkerError(element, message) {
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+                setTimeout(() => {
+                    if (element) element.style.display = 'none';
+                }, 4000);
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+        
+        loadWorkersList();
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initWorkerModal);
+    } else {
+        initWorkerModal();
+    }
+})();
+</script>

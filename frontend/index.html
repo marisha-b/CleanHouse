@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чистый дом | Клининг в Иркутске</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+<div id="modal-placeholder"></div>
+<div id="client-modal-placeholder"></div>
+
+<div class="hero-section">
+    <div class="top-bar">
+        <div class="container top-bar-container">
+            <div class="top-bar-left-group">
+                <div class="top-bar-left">
+                    <img loading="lazy" src="img/логотип.png" alt="Чистый дом" class="logo-img">
+                    <span class="company-name">Чистый дом</span>
+                </div>
+                <div class="social-icons">
+                    <a href="#" class="social-link"><img loading="lazy" src="img/telegram.png" alt="Telegram"></a>
+                    <a href="#" class="social-link"><img loading="lazy" src="img/whatsapp.png" alt="WhatsApp"></a>
+                    <a href="#" class="social-link"><img loading="lazy" src="img/vk.png" alt="VK"></a>
+                </div>
+            </div>
+            <div class="top-bar-right-group">
+                <div class="contact-info">
+                    <div class="phone">+7 (950) 088 46 94</div>
+                    <div class="email">info@chistidom.ru</div>
+                </div>
+                <button class="login-btn" id="headerLoginBtn">Войти</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="header" id="top">
+        <div class="container header-container">
+            <h1>Чистый дом - клининговые услуги в Иркутске</h1>
+            <p class="subheader1">Закажите уборку в пару кликов - наш умный калькулятор моментально рассчитает точную стоимость, а вы просто выберете удобное время. Никаких скрытых цен и лишних звонков.</p>
+            <p class="subheader">В "Чистом доме" работают только профессионалы, которые действительно любят чистоту так же, как вы. Доверьте им своё пространство и наслаждайтесь идеальным порядком без хлопот.</p>
+            <div class="header-buttons">
+                <button type="button" class="btn btn--primary" id="mainOrderBtn" style="border:none; cursor:pointer; background-color:#FFE74A; color:#1a1a1a; padding:15px 40px; font-size:1.2rem; border-radius:12px; font-weight:600;">Оформить заявку</button>
+                <a href="prices.html#calculator" class="btn btn--outline">Рассчитать</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="services" id="services">
+    <div class="container">
+        <div class="services-header">
+            <a href="#services" class="services-link" id="servicesLink">
+                <h2 class="section-title">Наши услуги</h2>
+            </a>
+        </div>
+        <div id="services-container">
+            <div class="loading">Загрузка услуг...</div>
+        </div>
+    </div>
+</section>
+
+<section class="advantages">
+    <div class="container">
+        <h2>Почему нас выбирают?</h2>
+        <div class="advantages__grid">
+            <div class="advantage">
+                <img loading="lazy" src="img/прозрачно.png" alt="Прозрачно" class="advantage-icon">
+                <h4>Прозрачно</h4>
+                <p>Точная цена до начала работы, никаких доплат.</p>
+            </div>
+            <div class="advantage">
+                <img loading="lazy" src="img/безопасно.png" alt="Безопасно" class="advantage-icon">
+                <h4>Безопасно</h4>
+                <p>Все сотрудники оформлены и проверены.</p>
+            </div>
+            <div class="advantage">
+                <img loading="lazy" src="img/качественно.png" alt="Качественно" class="advantage-icon">
+                <h4>Качественно</h4>
+                <p>Используем профессиональную химию.</p>
+            </div>
+            <div class="advantage">
+                <img loading="lazy" src="img/удобно.png" alt="Удобно" class="advantage-icon">
+                <h4>Удобно</h4>
+                <p>Онлайн-заявка, фотоотчет, оплата картой.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="reviews" id="reviews">
+    <div class="container">
+        <div class="reviews-header">
+            <a href="#reviews" class="services-link" id="reviewsLink">
+                <h2 class="section-title">Отзывы наших клиентов</h2>
+            </a>
+            <div id="reviews-rating" class="reviews-rating"></div>
+        </div>
+        <div class="reviews-carousel">
+            <button class="carousel-arrow prev" id="prevReview">←</button>
+            <button class="carousel-arrow next" id="nextReview">→</button>
+            <div class="reviews-container" id="reviewsContainer">
+                <div class="loading">Загрузка отзывов...</div>
+            </div>
+        </div>
+        <div class="reviews-dots" id="reviewsDots"></div>
+    </div>
+</section>
+
+<div id="footer-placeholder"></div>
+
+<script src="components/loader.js"></script>
+<script src="script.js"></script>
+
+<script>
+// Кнопка входа в шапке
+const headerLoginBtn = document.getElementById('headerLoginBtn');
+if (headerLoginBtn) {
+    headerLoginBtn.onclick = function() {
+        const modal = document.getElementById('clientModal');
+        if (modal) modal.classList.add('active');
+    };
+}
+
+// Обновление кнопки после авторизации
+function updateHeaderButton() {
+    const client = localStorage.getItem('client');
+    const btn = document.getElementById('headerLoginBtn');
+    if (!btn) return;
+    
+    if (client) {
+        try {
+            const clientData = JSON.parse(client);
+            const name = clientData.name || clientData.full_name || 'Клиент';
+            btn.textContent = `👤 ${name}`;
+            btn.style.background = '#8B7355';
+            btn.style.border = 'none';
+            btn.onclick = function() {
+                window.location.href = 'client-cabinet.html';
+            };
+        } catch(e) {
+            console.error(e);
+        }
+    } else {
+        btn.textContent = 'Войти';
+        btn.style.background = 'rgba(255, 255, 255, 0.15)';
+        btn.style.border = '2px solid white';
+        btn.onclick = function() {
+            const modal = document.getElementById('clientModal');
+            if (modal) modal.classList.add('active');
+        };
+    }
+}
+
+updateHeaderButton();
+window.updateHeaderButton = updateHeaderButton;
+
+// Слушаем изменения localStorage
+window.addEventListener('storage', function(e) {
+    if (e.key === 'client') updateHeaderButton();
+});
+
+// Кнопка заказа
+const orderBtn = document.getElementById('mainOrderBtn');
+if (orderBtn) {
+    orderBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const client = localStorage.getItem('client');
+        if (!client) {
+            const modal = document.getElementById('clientModal');
+            if (modal) modal.classList.add('active');
+        } else {
+            window.location.href = 'order.html';
+        }
+    });
+}
+</script>
+
+</body>
+</html>
