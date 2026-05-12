@@ -240,33 +240,6 @@ router.post('/client-register', async (req, res) => {
     }
 });
 
-// ========== ПОЛУЧИТЬ ДАННЫЕ КЛИЕНТА ПО ID ==========
-router.get('/client/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const result = await pool.query(
-            'SELECT id, phone, email, full_name, role, created_at FROM users WHERE id = $1 AND role = $2', 
-            [id, 'client']
-        );
-        
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Клиент не найден' });
-        }
-        
-        const user = result.rows[0];
-        res.json({
-            id: user.id,
-            name: user.full_name,
-            full_name: user.full_name,
-            phone: user.phone,
-            email: user.email,
-            role: user.role,
-            created_at: user.created_at
-        });
-    } catch (err) {
-        console.error('❌ Ошибка получения клиента:', err);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
+
 
 module.exports = router;
