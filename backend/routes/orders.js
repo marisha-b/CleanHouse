@@ -22,7 +22,6 @@ function clearOrdersCache(clientId, orderId = null) {
             global.appCache.del(`/api/orders/details/${orderId}`);
         }
         
-        console.log(`🗑️ Очищен кэш заказов (client: ${clientId || 'all'}, order: ${orderId || 'none'})`);
     }
 }
 
@@ -66,7 +65,6 @@ router.post('/', async (req, res) => {
         
         clearOrdersCache(userId, orderId);
         
-        console.log(`📦 Новый заказ #${orderId} от клиента ${client_name}`);
         res.json({ success: true, order_id: orderId });
     } catch (err) {
         console.error('Ошибка создания заказа:', err);
