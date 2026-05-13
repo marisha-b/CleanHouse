@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
         const result = await pool.query(
             "SELECT id, phone, full_name, role FROM users WHERE role IN ('worker', 'manager', 'admin') ORDER BY id"
         );
-        console.log(`👥 Найдено сотрудников: ${result.rows.length}`);
+
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -97,14 +97,14 @@ router.post('/', async (req, res) => {
                 'INSERT INTO workers (user_id, rating, total_earnings, is_active) VALUES ($1, $2, $3, $4)',
                 [newUser.id, 0, 0, true]
             );
-            console.log(`✅ Сотрудник добавлен: ${newUser.full_name}`);
+  
         } else {
-            console.log(`✅ ${role === 'manager' ? 'Менеджер' : 'Администратор'} добавлен: ${newUser.full_name}`);
+
         }
         
         res.json(newUser);
     } catch (err) {
-        console.error('❌ Ошибка добавления пользователя:', err);
+        console.error(' Ошибка добавления пользователя:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -153,10 +153,10 @@ router.put('/:id', async (req, res) => {
             );
         }
         
-        console.log(`✅ Пользователь ${id} обновлён`);
+
         res.json({ success: true });
     } catch (err) {
-        console.error('❌ Ошибка обновления пользователя:', err);
+        console.error('Ошибка обновления пользователя:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -166,7 +166,6 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         
-        console.log(`🗑️ Удаление пользователя: ${id}`);
         
         // Проверяем, что удаляем не клиента
         const userCheck = await pool.query('SELECT role FROM users WHERE id = $1', [id]);
@@ -182,10 +181,8 @@ router.delete('/:id', async (req, res) => {
         // Потом удаляем пользователя
         await pool.query('DELETE FROM users WHERE id = $1', [id]);
         
-        console.log(`✅ Пользователь ${id} удалён`);
         res.json({ success: true });
     } catch (err) {
-        console.error('❌ Ошибка удаления пользователя:', err);
         res.status(500).json({ error: err.message });
     }
 });
