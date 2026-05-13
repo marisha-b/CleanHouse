@@ -31,7 +31,6 @@ function clearRelatedCache(orderId, clientId, workerId, shiftId) {
         global.appCache.del('/api/orders/new-orders');
         global.appCache.del('/api/orders/all-orders');
         global.appCache.del('/api/reports/all');
-        console.log(`🗑️ Кэш очищен (order:${orderId}, worker:${workerId})`);
     }
 }
 
@@ -148,7 +147,6 @@ router.post('/', upload.fields([{ name: 'before_photo' }, { name: 'after_photo' 
         const beforePhoto = req.files['before_photo'] ? `/uploads/${req.files['before_photo'][0].filename}` : null;
         const afterPhoto = req.files['after_photo'] ? `/uploads/${req.files['after_photo'][0].filename}` : null;
         
-        console.log(`📸 Создание отчёта для смены ${shift_id}`);
         
         // Получаем информацию о смене
         const shiftInfo = await pool.query(`
@@ -173,7 +171,7 @@ router.post('/', upload.fields([{ name: 'before_photo' }, { name: 'after_photo' 
             actualHours = Math.round(actualHours * 10) / 10;
         }
         
-        console.log(`⏱️ Отработано часов: ${actualHours}`);
+
         
         const result = await pool.query(
             'INSERT INTO reports (shift_id, before_photo_url, after_photo_url, comment, submitted_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *',
@@ -190,7 +188,7 @@ router.post('/', upload.fields([{ name: 'before_photo' }, { name: 'after_photo' 
             
             if (parseInt(remainingShifts.rows[0].count) === 0) {
                 await pool.query('UPDATE orders SET status = $1 WHERE id = $2', ['completed', orderId]);
-                console.log(`✅ Заказ #${orderId} выполнен полностью`);
+   
             } else {
                 await pool.query('UPDATE orders SET status = $1 WHERE id = $2', ['in_progress', orderId]);
             }
@@ -198,7 +196,7 @@ router.post('/', upload.fields([{ name: 'before_photo' }, { name: 'after_photo' 
         
         clearRelatedCache(orderId, clientId, workerId, shift_id);
         
-        console.log(`✅ Отчёт для смены ${shift_id} сохранён, отработано ${actualHours} часов`);
+
         res.json(result.rows[0]);
         
     } catch (err) {
@@ -247,7 +245,6 @@ router.delete('/:id', async (req, res) => {
         
         clearRelatedCache(orderId, clientId, workerId, report.rows[0].shift_id);
         
-        console.log(`🗑️ Отчёт #${id} удалён`);
         res.json({ success: true });
     } catch (err) {
         console.error('Ошибка удаления отчёта:', err);
