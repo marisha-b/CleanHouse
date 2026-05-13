@@ -48,7 +48,6 @@ router.post('/create', async (req, res) => {
             ['paid_online', payment_method, order_id]
         );
         
-        console.log(`💳 Оплата заказа #${order_id} на сумму ${amount} ₽, транзакция: ${transactionId}`);
         res.json({ success: true, payment: result.rows[0], transaction_id: transactionId });
     } catch (err) {
         console.error('Ошибка создания платежа:', err);
