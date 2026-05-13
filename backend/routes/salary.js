@@ -167,7 +167,7 @@ router.get('/company/revenue', async (req, res) => {
         `, [currentYear, currentMonth]);
         
         const revenue = parseFloat(ordersRevenue.rows[0].total) || 0;
-        console.log(`💰 Выручка от заказов: ${revenue}`);
+
         
         // Зарплаты сотрудников (только за выполненные смены в указанном месяце)
         const workersSalary = await pool.query(`
@@ -180,7 +180,7 @@ router.get('/company/revenue', async (req, res) => {
         `, [currentYear, currentMonth]);
         
         const workersExpense = parseFloat(workersSalary.rows[0].total) || 0;
-        console.log(`👨‍🔧 Расходы на сотрудников: ${workersExpense}`);
+   
         
         // Зарплаты менеджеров
         const managersSalary = await pool.query(`
@@ -190,12 +190,12 @@ router.get('/company/revenue', async (req, res) => {
         `);
         
         const managersExpense = parseFloat(managersSalary.rows[0].total) || 0;
-        console.log(`📋 Расходы на менеджеров: ${managersExpense}`);
+
         
         const totalExpenses = workersExpense + managersExpense;
         const profit = revenue - totalExpenses;
         
-        console.log(`📈 Итого: Выручка=${revenue}, Расходы=${totalExpenses}, Прибыль=${profit}`);
+  
         
         res.json({
             revenue: revenue,
