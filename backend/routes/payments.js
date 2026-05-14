@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 
-// Создать платёж (онлайн оплата - заглушка)
+// Создать платёж (онлайн оплата)
 router.post('/create', async (req, res) => {
     try {
         const { order_id, amount, payment_method, card_number, card_holder, expiry_date, cvv } = req.body;
