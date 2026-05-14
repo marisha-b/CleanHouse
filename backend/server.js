@@ -24,14 +24,12 @@ app.use('/api', (req, res, next) => {
         const cachedData = cache.get(cacheKey);
         
         if (cachedData) {
-            console.log(`📦 Cache HIT: ${cacheKey}`);
             return res.json(cachedData);
         }
         
         const originalJson = res.json;
         res.json = function(data) {
             cache.set(cacheKey, data);
-            console.log(`💾 Cache SET: ${cacheKey}`);
             originalJson.call(this, data);
         };
     }
@@ -49,7 +47,7 @@ app.use(express.static(path.join(__dirname, '../frontend/components'), staticOpt
 app.use(express.static(path.join(__dirname, '../'), staticOptions));
 app.use(express.static(path.join(__dirname, './'), staticOptions));
 
-// ========== МАРШРУТЫ API ==========
+// МАРШРУТЫ API 
 app.use('/api/services', require('./routes/services'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/orders', require('./routes/orders'));
@@ -65,7 +63,6 @@ app.use('/api/salary', require('./routes/salary'));
 // Маршрут для очистки кэша
 app.post('/api/cache/clear', async (req, res) => {
     cache.flushAll();
-    console.log('🗑️ Cache cleared');
     res.json({ success: true, message: 'Кэш очищен' });
 });
 
@@ -74,39 +71,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-app.get('/index.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
-});
-
-app.get('/admin-cabinet.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/admin-cabinet.html'));
-});
-
-app.get('/manager-cabinet.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/manager-cabinet.html'));
-});
-
-app.get('/worker-cabinet.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/worker-cabinet.html'));
-});
-
-app.get('/prices.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/prices.html'));
-});
-
-app.get('/order.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/order.html'));
-});
-
-app.get('/schedule.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/schedule.html'));
-});
-
-app.get('/client-cabinet.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/client-cabinet.html'));
-});
-
 app.listen(PORT, () => {
-    console.log(`✅ Сервер запущен на http://localhost:${PORT}`);
-    console.log(`📦 Кэш включён, TTL: 300 секунд`);
+    console.log(`Сервер запущен на http://localhost:${PORT}`);
 });
