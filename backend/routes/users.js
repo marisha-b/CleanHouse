@@ -45,7 +45,6 @@ router.post('/', async (req, res) => {
     try {
         const { full_name, phone, role, password } = req.body;
         
-        console.log('📝 Добавление пользователя:', { full_name, phone, role, password: password ? '***' : 'ОТСУТСТВУЕТ' });
         
         // Проверяем, что все поля заполнены
         if (!full_name || full_name.trim() === '') {
@@ -115,7 +114,6 @@ router.put('/:id', async (req, res) => {
         const { full_name, phone, role, password } = req.body;
         const { id } = req.params;
         
-        console.log('✏️ Обновление пользователя:', { id, full_name, phone, role, password: password ? '***' : 'не меняется' });
         
         // Не даём изменить роль на client
         if (role === 'client') {
