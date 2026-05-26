@@ -41,8 +41,6 @@ const staticOptions = {
 
 app.use(express.static(path.join(__dirname, '../frontend'), staticOptions));
 app.use(express.static(path.join(__dirname, '../frontend/components'), staticOptions));
-app.use(express.static(path.join(__dirname, '../'), staticOptions));
-app.use(express.static(path.join(__dirname, './'), staticOptions));
 
 // МАРШРУТЫ API 
 app.use('/api/services', require('./routes/services'));
