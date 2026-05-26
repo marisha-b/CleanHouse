@@ -13,7 +13,6 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 global.appCache = cache;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Middleware для кэширования GET запросов
 app.use('/api', (req, res, next) => {
