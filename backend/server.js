@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 const NodeCache = require('node-cache');
@@ -13,7 +12,6 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 // Делаем кэш доступным для других модулей
 global.appCache = cache;
 
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
