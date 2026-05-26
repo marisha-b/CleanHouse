@@ -220,7 +220,7 @@
     <div class="admin-header">
         <h1>Админ-панель</h1>
         <div>
-            <button class="btn-cache" onclick="clearCache()">🗑️ Очистить кэш</button>
+            <button class="btn-cache" onclick="clearCache()">Очистить кэш</button>
             <button class="btn-add" onclick="logout()" style="background: #cc0000;">Выйти</button>
         </div>
     </div>
@@ -247,7 +247,7 @@
     </div>
     
     <div class="tabs">
-        <button class="tab-btn active" data-tab="analytics">📊 Аналитика</button>
+        <button class="tab-btn active" data-tab="analytics">Аналитика</button>
         <button class="tab-btn" data-tab="services">Услуги</button>
         <button class="tab-btn" data-tab="employees">Сотрудники</button>
         <button class="tab-btn" data-tab="ratings">Рейтинг и отзывы</button>
@@ -473,7 +473,7 @@
             document.getElementById('financeRevenue').innerHTML = Math.round(data.revenue || 0).toLocaleString() + ' ₽';
             document.getElementById('financeExpenses').innerHTML = Math.round(data.expenses || 0).toLocaleString() + ' ₽';
             document.getElementById('financeProfit').innerHTML = Math.round(data.profit || 0).toLocaleString() + ' ₽';
-            document.getElementById('expensesDetails').innerHTML = `<p>👨‍🔧 Зарплаты сотрудников: ${Math.round(data.workers_salary || 0).toLocaleString()} ₽</p><p>📋 Зарплаты менеджеров: ${Math.round(data.managers_salary || 0).toLocaleString()} ₽</p>`;
+            document.getElementById('expensesDetails').innerHTML = `<p>Зарплаты сотрудников: ${Math.round(data.workers_salary || 0).toLocaleString()} ₽</p><p>📋 Зарплаты менеджеров: ${Math.round(data.managers_salary || 0).toLocaleString()} ₽</p>`;
         } catch(e) { console.error(e); }
     }
     
