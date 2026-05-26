@@ -247,17 +247,6 @@ small {
             const phone = document.getElementById('clientPhoneLogin')?.value.trim();
             const password = document.getElementById('clientPasswordLogin')?.value;
             
-            if (!phone) {
-                showError(loginError, 'Введите телефон');
-                highlightError(document.getElementById('clientPhoneLogin'));
-                return;
-            }
-            if (!password) {
-                showError(loginError, 'Введите пароль');
-                highlightError(document.getElementById('clientPasswordLogin'));
-                return;
-            }
-            
             this.disabled = true;
             this.textContent = 'Вход...';
             if (loginError) loginError.style.display = 'none';
