@@ -97,15 +97,15 @@
             <div class="client-info" id="clientInfo">Загрузка...</div>
         </div>
         <div>
-            <button class="btn-cache" onclick="clearCacheAndReload()">🗑️ Очистить кэш</button>
-            <button class="btn-refresh" onclick="loadOrders()">🔄 Обновить</button>
-            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+            <button class="btn-cache" onclick="clearCacheAndReload()">Очистить кэш</button>
+            <button class="btn-refresh" onclick="loadOrders()">Обновить</button>
+            <button class="btn-logout" onclick="logout()">Выйти</button>
         </div>
     </div>
     
     <div class="tabs">
-        <button class="tab-btn active" data-tab="orders">📦 Мои заказы</button>
-        <button class="tab-btn" data-tab="reviews">⭐ Мои отзывы</button>
+        <button class="tab-btn active" data-tab="orders">Мои заказы</button>
+        <button class="tab-btn" data-tab="reviews">Мои отзывы</button>
     </div>
     
     <!-- Заказы -->
@@ -138,7 +138,7 @@
     }
     
     const clientName = currentClient.name || currentClient.full_name || 'Клиент';
-    document.getElementById('clientInfo').innerHTML = `${escapeHtml(clientName)}<br>📞 ${escapeHtml(currentClient.phone)}`;
+    document.getElementById('clientInfo').innerHTML = `${escapeHtml(clientName)}<br> ${escapeHtml(currentClient.phone)}`;
     
     // Очистка кэша и перезагрузка
     async function clearCacheAndReload() {
@@ -146,11 +146,11 @@
             const res = await fetch('/api/cache/clear', { method: 'POST' });
             if (res.ok) {
                 if (window.apiCache) window.apiCache.clear();
-                alert('✅ Кэш очищен');
+                alert('Кэш очищен');
                 loadOrders();
                 loadMyReviews();
             } else {
-                alert('❌ Ошибка очистки кэша');
+                alert('Ошибка очистки кэша');
             }
         } catch(e) {
             console.error(e);
@@ -195,14 +195,14 @@
             container.innerHTML = orders.map(order => `
                 <div class="order-card" onclick="toggleOrderDetails(${order.id})">
                     <div class="order-header">
-                        <span class="order-id">📋 Заказ #${order.id}</span>
-                        <span class="order-date">📅 ${new Date(order.order_date).toLocaleDateString()}</span>
+                        <span class="order-id"> Заказ #${order.id}</span>
+                        <span class="order-date"> ${new Date(order.order_date).toLocaleDateString()}</span>
                         <span class="order-status status-${order.status === 'completed' ? 'completed' : order.status === 'cancelled' ? 'cancelled' : order.status === 'in_progress' ? 'in-progress' : 'new'}">
-                            ${order.status === 'completed' ? '✅ Выполнен' : order.status === 'cancelled' ? '❌ Отменён' : order.status === 'in_progress' ? '🔄 В работе' : '🆕 Новый'}
+                            ${order.status === 'completed' ? ' Выполнен' : order.status === 'cancelled' ? ' Отменён' : order.status === 'in_progress' ? '🔄 В работе' : '🆕 Новый'}
                         </span>
                     </div>
-                    <div><strong>📍 Адрес:</strong> ${escapeHtml(order.address)}</div>
-                    <div><strong>💰 Сумма:</strong> ${order.total_price || 0} ₽</div>
+                    <div><strong> Адрес:</strong> ${escapeHtml(order.address)}</div>
+                    <div><strong> Сумма:</strong> ${order.total_price || 0} ₽</div>
                     <div class="order-details" id="details-${order.id}">
                         <div id="details-content-${order.id}">Загрузка деталей...</div>
                     </div>
@@ -256,9 +256,9 @@
                 data.reports.forEach(r => {
                     reportsHtml += `
                         <div class="report-card" onclick="event.stopPropagation()">
-                            <div><strong>👤 Сотрудник:</strong> ${escapeHtml(r.worker_name)}</div>
-                            <div><strong>📅 Дата:</strong> ${new Date(r.shift_date).toLocaleDateString()}</div>
-                            <div><strong>💬 Комментарий:</strong> ${escapeHtml(r.comment || 'Без комментария')}</div>
+                            <div><strong>Сотрудник:</strong> ${escapeHtml(r.worker_name)}</div>
+                            <div><strong>Дата:</strong> ${new Date(r.shift_date).toLocaleDateString()}</div>
+                            <div><strong>Комментарий:</strong> ${escapeHtml(r.comment || 'Без комментария')}</div>
                             ${r.before_photo_url ? `<img loading="lazy" src="${r.before_photo_url}" class="report-photo" onclick="event.stopPropagation(); showPhoto('${r.before_photo_url}')">` : ''}
                             ${r.after_photo_url ? `<img loading="lazy" src="${r.after_photo_url}" class="report-photo" onclick="event.stopPropagation(); showPhoto('${r.after_photo_url}')">` : ''}
                         </div>
@@ -282,12 +282,12 @@
                 if (existingReview && existingReview.id) {
                     reviewHtml = `
                         <div class="existing-review" onclick="event.stopPropagation()">
-                            <div class="review-thanks">✅ Спасибо за ваш отзыв!</div>
+                            <div class="review-thanks">Спасибо за ваш отзыв!</div>
                             <div class="stars" style="font-size:1.3rem;">${'★'.repeat(existingReview.rating)}${'☆'.repeat(5 - existingReview.rating)}</div>
-                            <p><strong>💬 Ваш отзыв:</strong> "${escapeHtml(existingReview.comment)}"</p>
+                            <p><strong Ваш отзыв:</strong> "${escapeHtml(existingReview.comment)}"</p>
                             ${existingReview.admin_reply ? `
                                 <div class="admin-reply" onclick="event.stopPropagation()">
-                                    <strong>👑 Ответ администратора:</strong><br>
+                                    <strong> Ответ администратора:</strong><br>
                                     ${escapeHtml(existingReview.admin_reply)}
                                 </div>
                             ` : ''}
@@ -297,7 +297,7 @@
                     const worker = data.workers[0];
                     reviewHtml = `
                         <div class="review-section" id="review-form-${orderId}" onclick="event.stopPropagation()">
-                            <strong>⭐ Оцените качество работы:</strong>
+                            <strong>Оцените качество работы:</strong>
                             <div class="rating-select" id="rating-${orderId}" onclick="event.stopPropagation()">
                                 ${[1,2,3,4,5].map(star => `<span class="star-rating" data-value="${star}" onclick="event.stopPropagation(); setRating(${orderId}, ${star}, ${worker.id})">★</span>`).join('')}
                             </div>
@@ -370,14 +370,14 @@
             const data = await res.json();
             
             if (res.ok) {
-                alert('✅ Спасибо за ваш отзыв!');
+                alert('Спасибо за ваш отзыв!');
                 loadOrderDetails(orderId, 'completed');
                 if (document.querySelector('.tab-btn.active').dataset.tab === 'reviews') {
                     loadMyReviews();
                 }
                 selectedRating.value = null;
             } else {
-                alert('❌ Ошибка: ' + (data.error || 'Не удалось отправить отзыв'));
+                alert('Ошибка: ' + (data.error || 'Не удалось отправить отзыв'));
             }
         } catch(e) {
             console.error(e);
@@ -385,7 +385,7 @@
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '📝 Отправить отзыв';
+                submitBtn.textContent = 'Отправить отзыв';
             }
         }
     }
@@ -414,14 +414,14 @@
             container.innerHTML = reviews.map(r => `
                 <div class="order-card" onclick="toggleOrderDetails(${r.order_id})">
                     <div class="order-header">
-                        <span class="order-id">📋 Заказ #${r.order_id}</span>
-                        <span class="order-date">📅 ${new Date(r.created_at).toLocaleDateString()}</span>
+                        <span class="order-id">Заказ #${r.order_id}</span>
+                        <span class="order-date">${new Date(r.created_at).toLocaleDateString()}</span>
                     </div>
                     <div class="stars" style="font-size:1.3rem; margin: 10px 0;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-                    <p><strong>💬 Ваш отзыв:</strong> "${escapeHtml(r.comment)}"</p>
+                    <p><strong>Ваш отзыв:</strong> "${escapeHtml(r.comment)}"</p>
                     ${r.admin_reply ? `
                         <div class="admin-reply">
-                            <strong>👑 Ответ администратора:</strong><br>
+                            <strong>Ответ администратора:</strong><br>
                             ${escapeHtml(r.admin_reply)}
                         </div>
                     ` : '<p style="color:#999; margin-top:10px;">Ответ администратора появится позже</p>'}
