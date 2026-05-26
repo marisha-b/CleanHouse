@@ -123,31 +123,31 @@
             <li><a href="index.html" class="nav-link">Главная</a></li>
             <li><a href="prices.html" class="nav-link">Цены</a></li>
             <li><a href="schedule.html" class="nav-link">Расписание</a></li>
-            <li><a href="worker-cabinet.html" class="nav-link">🧹 Мой кабинет</a></li>
+            <li><a href="worker-cabinet.html" class="nav-link"> Мой кабинет</a></li>
         </ul>
     </div>
 </nav>
 
 <div class="worker-cabinet">
     <div class="worker-header">
-        <h1>🧹 Кабинет сотрудника</h1>
+        <h1> Кабинет сотрудника</h1>
         <div>
-            <button class="btn-clear-cache" onclick="clearCache()">🗑️ Очистить кэш</button>
-            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+            <button class="btn-clear-cache" onclick="clearCache()"> Очистить кэш</button>
+            <button class="btn-logout" onclick="logout()"> Выйти</button>
         </div>
     </div>
     
     <div class="stats-grid">
-        <div class="stat-card"><div class="stat-value" id="rating">-</div><div class="stat-label">⭐ Рейтинг</div></div>
-        <div class="stat-card"><div class="stat-value" id="hourlyRate">-</div><div class="stat-label">💰 Ставка (₽/час)</div></div>
-        <div class="stat-card"><div class="stat-value" id="totalEarned">-</div><div class="stat-label">💵 Заработано всего</div></div>
-        <div class="stat-card"><div class="stat-value" id="ordersCount">-</div><div class="stat-label">✅ Выполнено заказов</div></div>
+        <div class="stat-card"><div class="stat-value" id="rating">-</div><div class="stat-label"> Рейтинг</div></div>
+        <div class="stat-card"><div class="stat-value" id="hourlyRate">-</div><div class="stat-label"> Ставка (₽/час)</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalEarned">-</div><div class="stat-label"> Заработано всего</div></div>
+        <div class="stat-card"><div class="stat-value" id="ordersCount">-</div><div class="stat-label"> Выполнено заказов</div></div>
     </div>
     
-    <h2>📅 Мои смены</h2>
+    <h2> Мои смены</h2>
     <div id="shiftsContainer">Загрузка...</div>
     
-    <h2>📸 Загрузить отчёт</h2>
+    <h2> Загрузить отчёт</h2>
     <div class="report-form">
         <select id="reportShiftId">
             <option value="">-- Выберите смену --</option>
@@ -160,7 +160,7 @@
         <button class="btn-submit" onclick="submitReport()">📤 Отправить отчёт</button>
     </div>
     
-    <h2>💰 Калькулятор зарплаты</h2>
+    <h2> Калькулятор зарплаты</h2>
     <div class="salary-calculator">
         <div class="date-range">
             <label>Начало периода:</label>
@@ -172,24 +172,24 @@
         
         <div id="salaryResult" class="salary-result" style="display: none;">
             <div class="salary-header">
-                <h4>💰 Результат расчёта</h4>
+                <h4> Результат расчёта</h4>
                 <p id="salaryPeriodDisplay"></p>
             </div>
             <div class="salary-info">
                 <div class="salary-info-item">
-                    <div class="label">⏱️ Отработано часов</div>
+                    <div class="label"> Отработано часов</div>
                     <div class="value" id="displayTotalHours">--</div>
                 </div>
                 <div class="salary-info-item">
-                    <div class="label">💵 Ставка</div>
+                    <div class="label"> Ставка</div>
                     <div class="value" id="displayHourlyRate">--</div>
                 </div>
                 <div class="salary-info-item net">
-                    <div class="label">🏦 Итого к выплате</div>
+                    <div class="label"> Итого к выплате</div>
                     <div class="value" id="displayTotalEarnings">--</div>
                 </div>
             </div>
-            <button class="btn-download" onclick="downloadPayslip()" id="downloadBtn" style="display: none;">📄 Скачать расчётный лист</button>
+            <button class="btn-download" onclick="downloadPayslip()" id="downloadBtn" style="display: none;"> Скачать расчётный лист</button>
         </div>
         
         <div id="hoursDetails" style="display: none; margin-top: 20px;">
@@ -224,7 +224,7 @@
         try {
             await fetch('/api/cache/clear', { method: 'POST' });
             if (window.apiCache) window.apiCache.clear();
-            alert('✅ Кэш очищен');
+            alert(' Кэш очищен');
             loadShifts();
             loadStats();
         } catch(e) {
@@ -263,16 +263,16 @@
                 container.innerHTML = shifts.map(s => `
                     <div class="shift-item">
                         <div class="shift-header">
-                            <span>📅 ${new Date(s.shift_date).toLocaleDateString()}</span>
-                            <span>⏰ ${s.start_time?.substring(0,5)} - ${s.end_time?.substring(0,5)}</span>
+                            <span> ${new Date(s.shift_date).toLocaleDateString()}</span>
+                            <span> ${s.start_time?.substring(0,5)} - ${s.end_time?.substring(0,5)}</span>
                             <span class="status status-${s.status === 'completed' ? 'completed' : s.status === 'in_progress' ? 'in-progress' : 'scheduled'}">
-                                ${s.status === 'completed' ? '✅ Выполнена' : s.status === 'in_progress' ? '🔄 В работе' : '⏳ Запланирована'}
+                                ${s.status === 'completed' ? ' Выполнена' : s.status === 'in_progress' ? ' В работе' : ' Запланирована'}
                             </span>
                         </div>
-                        ${s.address ? `<div class="shift-address">📍 Адрес: ${escapeHtml(s.address)}</div>` : ''}
-                        <div>📋 ${s.description || 'Рабочая смена'}</div>
-                        ${s.order_id ? `<div>📦 Заказ #${s.order_id}</div>` : ''}
-                        ${s.actual_hours ? `<div>⏱️ Отработано часов: ${s.actual_hours}</div>` : ''}
+                        ${s.address ? `<div class="shift-address"> Адрес: ${escapeHtml(s.address)}</div>` : ''}
+                        <div> ${s.description || 'Рабочая смена'}</div>
+                        ${s.order_id ? `<div> Заказ #${s.order_id}</div>` : ''}
+                        ${s.actual_hours ? `<div> Отработано часов: ${s.actual_hours}</div>` : ''}
                     </div>
                 `).join('');
                 
@@ -295,7 +295,7 @@
                         <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
                         <p style="margin: 10px 0;">"${escapeHtml(r.comment)}"</p>
                         <small>${new Date(r.created_at).toLocaleDateString()}</small>
-                        ${r.address ? `<small> - 📍 ${escapeHtml(r.address)}</small>` : ''}
+                        ${r.address ? `<small> -  ${escapeHtml(r.address)}</small>` : ''}
                     </div>
                 `).join('');
             }
@@ -323,7 +323,7 @@
         try {
             const res = await fetch('/api/reports', { method: 'POST', body: formData });
             if (res.ok) {
-                alert('✅ Отчёт отправлен!');
+                alert(' Отчёт отправлен!');
                 document.getElementById('reportComment').value = '';
                 document.getElementById('beforePhoto').value = '';
                 document.getElementById('afterPhoto').value = '';
@@ -331,7 +331,7 @@
                 await loadStats();
                 await clearCache();
             } else {
-                alert('❌ Ошибка отправки');
+                alert(' Ошибка отправки');
             }
         } catch(e) { alert('Ошибка: ' + e.message); }
         finally {
@@ -430,7 +430,7 @@
             alert('Ошибка расчёта: ' + e.message);
         } finally {
             calcBtn.disabled = false;
-            calcBtn.textContent = '📊 Рассчитать';
+            calcBtn.textContent = ' Рассчитать';
         }
     }
     
@@ -519,10 +519,10 @@
             </table>
             
             <div class="summary">
-                <p class="total-hours">📊 Итого часов: ${data.totalHours}</p>
-                <p class="total-earnings">💰 Начислено: ${Math.round(data.totalEarnings).toLocaleString()} ₽</p>
-                <p class="tax">📉 НДФЛ (13%): ${tax.toLocaleString()} ₽</p>
-                <p class="net">💵 Итого к выплате: ${Math.round(netEarnings).toLocaleString()} ₽</p>
+                <p class="total-hours"> Итого часов: ${data.totalHours}</p>
+                <p class="total-earnings"> Начислено: ${Math.round(data.totalEarnings).toLocaleString()} ₽</p>
+                <p class="tax"> НДФЛ (13%): ${tax.toLocaleString()} ₽</p>
+                <p class="net"> Итого к выплате: ${Math.round(netEarnings).toLocaleString()} ₽</p>
             </div>
             
             <div class="footer">
