@@ -218,7 +218,7 @@
 
 <div class="admin-cabinet">
     <div class="admin-header">
-        <h1>👑 Админ-панель</h1>
+        <h1>Админ-панель</h1>
         <div>
             <button class="btn-cache" onclick="clearCache()">🗑️ Очистить кэш</button>
             <button class="btn-add" onclick="logout()" style="background: #cc0000;">Выйти</button>
@@ -228,41 +228,41 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-value" id="workersCount">-</div>
-            <div class="stat-label">👥 Сотрудников</div>
+            <div class="stat-label">Сотрудников</div>
         </div>
         <div class="stat-card">
             <div class="stat-value" id="avgRating">-</div>
-            <div class="stat-label">⭐ Средний рейтинг</div>
+            <div class="stat-label">Средний рейтинг</div>
         </div>
         <div class="stat-card" id="shiftsCard" style="cursor: pointer;">
             <div class="stat-value" id="weeklyShifts">-</div>
-            <div class="stat-label">📅 Смен на неделе</div>
-            <div class="stat-hint">👆 Нажмите для просмотра</div>
+            <div class="stat-label">Смен на неделе</div>
+            <div class="stat-hint">Нажмите для просмотра</div>
         </div>
         <div class="stat-card" id="revenueCard" style="cursor: pointer;">
             <div class="stat-value" id="monthRevenue">-</div>
-            <div class="stat-label">💰 Выручка за месяц</div>
-            <div class="stat-hint">👆 Нажмите для деталей</div>
+            <div class="stat-label">Выручка за месяц</div>
+            <div class="stat-hint">Нажмите для деталей</div>
         </div>
     </div>
     
     <div class="tabs">
         <button class="tab-btn active" data-tab="analytics">📊 Аналитика</button>
-        <button class="tab-btn" data-tab="services">🧹 Услуги</button>
-        <button class="tab-btn" data-tab="employees">👥 Сотрудники</button>
-        <button class="tab-btn" data-tab="ratings">⭐ Рейтинг и отзывы</button>
-        <button class="tab-btn" data-tab="finance">💰 Финансы</button>
+        <button class="tab-btn" data-tab="services">Услуги</button>
+        <button class="tab-btn" data-tab="employees">Сотрудники</button>
+        <button class="tab-btn" data-tab="ratings">Рейтинг и отзывы</button>
+        <button class="tab-btn" data-tab="finance">Финансы</button>
     </div>
     
     <!-- Аналитика -->
     <div id="analyticsPanel" class="tab-panel active">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <div class="chart-container">
-                <h3>⭐ Рейтинг сотрудников</h3>
+                <h3>Рейтинг сотрудников</h3>
                 <div id="workersRating">Загрузка...</div>
             </div>
             <div class="chart-container">
-                <h3>📊 Популярность услуг</h3>
+                <h3>Популярность услуг</h3>
                 <canvas id="popularServicesChart"></canvas>
                 <div id="popularServices" style="margin-top: 15px;"></div>
             </div>
@@ -270,20 +270,20 @@
         
         <!-- График распределения оценок -->
         <div class="chart-container">
-            <h3>⭐ Распределение оценок в отзывах</h3>
+            <h3>Распределение оценок в отзывах</h3>
             <canvas id="reviewsRatingChart" style="max-height: 300px;"></canvas>
             <div id="reviewsDistribution" style="margin-top: 20px;"></div>
         </div>
         
         <!-- Новый график: Динамика заказов по месяцам -->
         <div class="chart-container">
-            <h3>📈 Динамика количества заказов по месяцам</h3>
+            <h3>Динамика количества заказов по месяцам</h3>
             <canvas id="ordersByMonthChart" style="max-height: 300px;"></canvas>
         </div>
         
         <!-- Новый график: Выручка по месяцам -->
         <div class="chart-container">
-            <h3>💰 Динамика выручки по месяцам</h3>
+            <h3>Динамика выручки по месяцам</h3>
             <canvas id="revenueByMonthChart" style="max-height: 300px;"></canvas>
         </div>
     </div>
@@ -309,7 +309,7 @@
         
         <div class="section-header">
             <button class="btn-add" id="addEmployeeBtn">+ Добавить сотрудника</button>
-            <h3 style="color: #5D4A36; margin: 0;">📋 Список сотрудников</h3>
+            <h3 style="color: #5D4A36; margin: 0;">Список сотрудников</h3>
         </div>
         
         <table class="employees-table">
@@ -323,12 +323,12 @@
     <!-- Рейтинг и отзывы -->
     <div id="ratingsPanel" class="tab-panel">
         <div class="chart-container">
-            <h3>📈 Динамика отзывов за последние 30 дней</h3>
+            <h3>Динамика отзывов за последние 30 дней</h3>
             <canvas id="reviewsTrendChart"></canvas>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-            <h3 style="color: #5D4A36;">💬 Все отзывы</h3>
-            <button class="btn-add" onclick="loadAllReviews()" style="background: #8B7355;">🔄 Обновить</button>
+            <h3 style="color: #5D4A36;">Все отзывы</h3>
+            <button class="btn-add" onclick="loadAllReviews()" style="background: #8B7355;">Обновить</button>
         </div>
         <div id="allReviewsList">Загрузка отзывов...</div>
     </div>
@@ -344,25 +344,25 @@
                     <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
                 </select>
                 <input type="number" id="financeYear" value="2026">
-                <button class="btn-add" onclick="loadFinanceData()" style="background: #8B7355;">📊 Рассчитать</button>
+                <button class="btn-add" onclick="loadFinanceData()" style="background: #8B7355;">Рассчитать</button>
             </div>
             
             <div class="finance-stats">
-                <div class="finance-stat"><div class="value" id="financeRevenue">0 ₽</div><div class="label">💰 Выручка</div></div>
-                <div class="finance-stat"><div class="value expense-value" id="financeExpenses">0 ₽</div><div class="label">📉 Расходы</div></div>
-                <div class="finance-stat"><div class="value profit-value" id="financeProfit">0 ₽</div><div class="label">📈 Чистая прибыль</div></div>
+                <div class="finance-stat"><div class="value" id="financeRevenue">0 ₽</div><div class="label">Выручка</div></div>
+                <div class="finance-stat"><div class="value expense-value" id="financeExpenses">0 ₽</div><div class="label">Расходы</div></div>
+                <div class="finance-stat"><div class="value profit-value" id="financeProfit">0 ₽</div><div class="label">Чистая прибыль</div></div>
             </div>
             
             <div id="expensesDetails" style="margin-top: 15px; padding: 15px; background: #f8f5f0; border-radius: 12px;"></div>
         </div>
         
         <div class="finance-card">
-            <h3>💰 Ставки сотрудников</h3>
+            <h3>Ставки сотрудников</h3>
             <div id="workersRatesList">Загрузка...</div>
         </div>
         
         <div class="finance-card">
-            <h3>📋 Зарплаты менеджеров</h3>
+            <h3>Зарплаты менеджеров</h3>
             <div id="managersSalaryList">Загрузка...</div>
         </div>
     </div>
@@ -373,9 +373,9 @@
 
 <div id="employeeModal" class="modal"><div class="modal-content"><h3 id="employeeModalTitle">Добавить сотрудника</h3><input type="hidden" id="employeeId"><input type="text" id="employeeName" placeholder="ФИО сотрудника"><input type="tel" id="employeePhone" placeholder="Телефон"><select id="employeeRole"><option value="worker">Сотрудник</option><option value="manager">Менеджер</option></select><input type="password" id="employeePassword" placeholder="Пароль"><div><button class="btn-save" onclick="saveEmployee()">Сохранить</button><button class="btn-cancel" onclick="closeEmployeeModal()">Отмена</button></div></div></div>
 
-<div id="replyModal" class="modal"><div class="modal-content"><h3>💬 Ответить на отзыв</h3><input type="hidden" id="replyReviewId"><textarea id="replyText" rows="4" placeholder="Введите ответ на отзыв..."></textarea><div><button class="btn-save" onclick="submitReply()">Отправить ответ</button><button class="btn-cancel" onclick="closeReplyModal()">Отмена</button></div></div></div>
+<div id="replyModal" class="modal"><div class="modal-content"><h3>Ответить на отзыв</h3><input type="hidden" id="replyReviewId"><textarea id="replyText" rows="4" placeholder="Введите ответ на отзыв..."></textarea><div><button class="btn-save" onclick="submitReply()">Отправить ответ</button><button class="btn-cancel" onclick="closeReplyModal()">Отмена</button></div></div></div>
 
-<div id="rateModal" class="modal"><div class="modal-content"><h3>✏️ Редактировать ставку</h3><input type="hidden" id="rateUserId"><input type="hidden" id="rateUserType"><label id="rateLabel">Ставка (₽/час)</label><input type="number" id="rateValue" step="100"><div><button class="btn-save" onclick="saveRate()">Сохранить</button><button class="btn-cancel" onclick="closeRateModal()">Отмена</button></div></div></div>
+<div id="rateModal" class="modal"><div class="modal-content"><h3>Редактировать ставку</h3><input type="hidden" id="rateUserId"><input type="hidden" id="rateUserType"><label id="rateLabel">Ставка (₽/час)</label><input type="number" id="rateValue" step="100"><div><button class="btn-save" onclick="saveRate()">Сохранить</button><button class="btn-cancel" onclick="closeRateModal()">Отмена</button></div></div></div>
 
 <div id="footer-placeholder"></div>
 
@@ -531,8 +531,8 @@
             } else {
                 res = await fetch(`/api/salary/manager/${userId}/salary`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ monthly_salary: parseFloat(value), bonus: 0 }) });
             }
-            if (res.ok) { alert('✅ Ставка обновлена'); closeRateModal(); loadWorkersRates(); loadManagersSalaries(); }
-            else alert('❌ Ошибка');
+            if (res.ok) { alert('Ставка обновлена'); closeRateModal(); loadWorkersRates(); loadManagersSalaries(); }
+            else alert('Ошибка');
         } catch(e) { alert('Ошибка: ' + e.message); }
     }
     
@@ -640,8 +640,8 @@
         if (!reply.trim()) { alert('Введите текст ответа'); return; }
         try {
             const res = await fetch(`/api/reviews/${reviewId}/reply`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ admin_reply: reply }) });
-            if (res.ok) { alert('✅ Ответ добавлен'); closeReplyModal(); loadAllReviews(); }
-            else alert('❌ Ошибка');
+            if (res.ok) { alert('Ответ добавлен'); closeReplyModal(); loadAllReviews(); }
+            else alert('Ошибка');
         } catch(e) { alert('Ошибка'); }
     }
     
@@ -649,8 +649,8 @@
         if (!confirm('Удалить отзыв?')) return;
         try {
             const res = await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
-            if (res.ok) { alert('✅ Отзыв удалён'); loadAllReviews(); loadReviewsDistribution(); loadReviewsTrend(); }
-            else alert('❌ Ошибка');
+            if (res.ok) { alert('Отзыв удалён'); loadAllReviews(); loadReviewsDistribution(); loadReviewsTrend(); }
+            else alert('Ошибка');
         } catch(e) { alert('Ошибка'); }
     }
     
@@ -788,7 +788,7 @@ async function openShiftsCalendar() {
             <div id="shiftsModal" class="shifts-modal-overlay">
                 <div class="shifts-modal-content">
                     <div class="shifts-modal-header">
-                        <h2>📅 Календарь смен на текущую неделю</h2>
+                        <h2>Календарь смен на текущую неделю</h2>
                         <button class="shifts-modal-close" onclick="closeShiftsModal()">&times;</button>
                     </div>
                     <div style="overflow-x: auto;">
