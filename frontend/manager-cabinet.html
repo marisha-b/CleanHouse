@@ -115,32 +115,32 @@
             <li><a href="index.html" class="nav-link">Главная</a></li>
             <li><a href="prices.html" class="nav-link">Цены</a></li>
             <li><a href="schedule.html" class="nav-link">Расписание</a></li>
-            <li><a href="manager-cabinet.html" class="nav-link">📋 Панель менеджера</a></li>
+            <li><a href="manager-cabinet.html" class="nav-link">Панель менеджера</a></li>
         </ul>
     </div>
 </nav>
 
 <div class="manager-cabinet">
     <div class="manager-header">
-        <h1>📋 Панель менеджера</h1>
+        <h1>Панель менеджера</h1>
         <div>
             <button class="btn-back" onclick="goToAdmin()" id="backToAdminBtn" style="display: none;">← Назад в админку</button>
-            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+            <button class="btn-logout" onclick="logout()">Выйти</button>
         </div>
     </div>
     
     <div class="tabs">
-        <button class="tab-btn active" data-tab="new">🆕 Новые заказы</button>
-        <button class="tab-btn" data-tab="all">📋 Все заказы</button>
-        <button class="tab-btn" data-tab="reports">📸 Отчёты</button>
-        <button class="tab-btn" data-tab="reviews">⭐ Отзывы</button>
-        <button class="tab-btn" data-tab="salary">💰 Моя зарплата</button>
+        <button class="tab-btn active" data-tab="new">Новые заказы</button>
+        <button class="tab-btn" data-tab="all">Все заказы</button>
+        <button class="tab-btn" data-tab="reports">Отчёты</button>
+        <button class="tab-btn" data-tab="reviews">Отзывы</button>
+        <button class="tab-btn" data-tab="salary">Моя зарплата</button>
     </div>
     
     <!-- Новые заказы -->
     <div id="newPanel" class="tab-panel active">
         <div style="margin-bottom: 20px;">
-            <button class="btn-refresh" onclick="loadNewOrders()">🔄 Обновить</button>
+            <button class="btn-refresh" onclick="loadNewOrders()">Обновить</button>
         </div>
         <div id="newOrdersContainer">Загрузка...</div>
     </div>
@@ -148,7 +148,7 @@
     <!-- Все заказы -->
     <div id="allPanel" class="tab-panel">
         <div style="margin-bottom: 20px;">
-            <button class="btn-refresh" onclick="loadAllOrders()">🔄 Обновить</button>
+            <button class="btn-refresh" onclick="loadAllOrders()">Обновить</button>
         </div>
         <div id="allOrdersContainer">Загрузка...</div>
     </div>
@@ -156,7 +156,7 @@
     <!-- Отчёты -->
     <div id="reportsPanel" class="tab-panel">
         <div style="margin-bottom: 20px;">
-            <button class="btn-refresh" onclick="loadAllReports()">🔄 Обновить</button>
+            <button class="btn-refresh" onclick="loadAllReports()">Обновить</button>
         </div>
         <div id="reportsContainer">Загрузка...</div>
     </div>
@@ -164,7 +164,7 @@
     <!-- Отзывы -->
     <div id="reviewsPanel" class="tab-panel">
         <div style="margin-bottom: 20px;">
-            <button class="btn-refresh" onclick="loadAllReviews()">🔄 Обновить</button>
+            <button class="btn-refresh" onclick="loadAllReviews()">Обновить</button>
         </div>
         <div id="reviewsContainer">Загрузка...</div>
     </div>
@@ -172,13 +172,13 @@
     <!-- Зарплата -->
     <div id="salaryPanel" class="tab-panel">
         <div class="salary-card">
-            <h3>💰 Моя зарплата</h3>
+            <h3>Моя зарплата</h3>
             <div class="salary-value" id="managerSalary">Загрузка...</div>
             <div class="salary-period">
                 <input type="date" id="salaryStartDate">
                 <input type="date" id="salaryEndDate">
-                <button class="btn-calc" onclick="calculateSalary()">📊 Рассчитать</button>
-                <button class="btn-download" onclick="downloadPayslip()" id="downloadBtn" style="display: none;">📄 Скачать расчётный лист</button>
+                <button class="btn-calc" onclick="calculateSalary()">Рассчитать</button>
+                <button class="btn-download" onclick="downloadPayslip()" id="downloadBtn" style="display: none;">Скачать расчётный лист</button>
             </div>
             <div id="salaryResult" class="salary-result"></div>
         </div>
@@ -198,7 +198,7 @@
             </select>
         </div>
         <div class="modal-buttons">
-            <button class="btn-save" onclick="assignWorker()">✅ Назначить</button>
+            <button class="btn-save" onclick="assignWorker()">Назначить</button>
             <button class="btn-cancel" onclick="closeAssignModal()">Отмена</button>
         </div>
     </div>
@@ -279,13 +279,13 @@
             
             document.getElementById('salaryResult').innerHTML = `
                 <div style="padding: 15px;">
-                    <p><strong>📅 Период:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
-                    <p><strong>💰 Оклад:</strong> ${data.monthly_salary.toLocaleString()} ₽</p>
-                    <p><strong>🎁 Премия:</strong> ${data.bonus.toLocaleString()} ₽</p>
-                    <p><strong>📊 Рабочих дней:</strong> ${data.period.workDays} дней</p>
-                    <p><strong>💵 Заработная плата за период:</strong> ${data.salary_for_period.toLocaleString()} ₽</p>
-                    <p style="margin-top: 10px;"><strong>💸 НДФЛ (13%):</strong> ${data.tax.toLocaleString()} ₽</p>
-                    <p style="font-size: 1.3rem; font-weight: 700; color: #4CAF50; margin-top: 15px;">💵 Итого к выплате: ${data.net_salary.toLocaleString()} ₽</p>
+                    <p><strong>Период:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+                    <p><strong>Оклад:</strong> ${data.monthly_salary.toLocaleString()} ₽</p>
+                    <p><strong>Премия:</strong> ${data.bonus.toLocaleString()} ₽</p>
+                    <p><strong>Рабочих дней:</strong> ${data.period.workDays} дней</p>
+                    <p><strong>Заработная плата за период:</strong> ${data.salary_for_period.toLocaleString()} ₽</p>
+                    <p style="margin-top: 10px;"><strong>НДФЛ (13%):</strong> ${data.tax.toLocaleString()} ₽</p>
+                    <p style="font-size: 1.3rem; font-weight: 700; color: #4CAF50; margin-top: 15px;">Итого к выплате: ${data.net_salary.toLocaleString()} ₽</p>
                 </div>
             `;
             document.getElementById('downloadBtn').style.display = 'inline-block';
@@ -297,7 +297,7 @@
             alert('Ошибка расчёта: ' + e.message);
         } finally {
             btn.disabled = false;
-            btn.textContent = '📊 Рассчитать';
+            btn.textContent = 'Рассчитать';
         }
     }
     
@@ -528,10 +528,10 @@
                 });
                 const data = await res.json();
                 if (data.id) {
-                    alert('✅ Ответ добавлен!');
+                    alert('Ответ добавлен!');
                     loadAllReviews();
                 } else {
-                    alert('❌ Ошибка');
+                    alert('Ошибка');
                 }
             } catch(e) {
                 alert('Ошибка: ' + e.message);
@@ -566,10 +566,10 @@
             
             if (order) {
                 document.getElementById('orderInfo').innerHTML = `
-                    📅 Дата: ${new Date(order.order_date).toLocaleDateString()}<br>
-                    ⏰ Время: ${order.time_slot || '09:00'}<br>
-                    📍 Адрес: ${escapeHtml(order.address)}<br>
-                    💰 Сумма: ${order.total_price} ₽
+                     Дата: ${new Date(order.order_date).toLocaleDateString()}<br>
+                     Время: ${order.time_slot || '09:00'}<br>
+                     Адрес: ${escapeHtml(order.address)}<br>
+                     Сумма: ${order.total_price} ₽
                 `;
             } else {
                 document.getElementById('orderInfo').innerHTML = 'Информация о заказе не найдена';
@@ -606,18 +606,18 @@
             const data = await res.json();
             
             if (res.ok) {
-                alert('✅ Сотрудник назначен!');
+                alert(' Сотрудник назначен!');
                 closeAssignModal();
                 await loadNewOrders();
                 await loadAllOrders();
             } else {
-                alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+                alert(' Ошибка: ' + (data.error || 'Неизвестная ошибка'));
             }
         } catch(e) {
             alert('Ошибка: ' + e.message);
         } finally {
             assignBtn.disabled = false;
-            assignBtn.textContent = '✅ Назначить';
+            assignBtn.textContent = ' Назначить';
         }
     }
     
