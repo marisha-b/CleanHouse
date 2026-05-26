@@ -27,8 +27,7 @@ router.get('/stats/avg-rating', async (req, res) => {
 // Количество смен на текущей неделе (ПН-ВС) - САМЫЙ ПРОСТОЙ И НАДЁЖНЫЙ
 router.get('/stats/weekly-shifts', async (req, res) => {
     try {
-        // Просто считаем все смены, у которых дата в этой неделе
-        // Используем EXTRACT(WEEK) - это самый надёжный способ в PostgreSQL
+        // считаем все смены, у которых дата в этой неделе
         const result = await pool.query(`
             SELECT COUNT(*) as count 
             FROM shifts 
