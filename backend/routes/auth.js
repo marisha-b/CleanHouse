@@ -79,7 +79,6 @@ router.post('/worker-login', async (req, res) => {
         // Проверяем пароль для каждого найденного пользователя
         let user = null;
         for (const u of result.rows) {
-            console.log(`Проверка пароля для: ${u.full_name}, сохранённый пароль: "${u.password_hash}", введённый: "${password}"`);
             if (u.password_hash === password) {
                 user = u;
                 break;
