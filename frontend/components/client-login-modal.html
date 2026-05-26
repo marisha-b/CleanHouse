@@ -263,9 +263,7 @@ small {
                     localStorage.setItem('client', JSON.stringify(data.user));
                     alert(`Добро пожаловать, ${data.user.name || data.user.full_name}!`);
                     if (modal) modal.classList.remove('active');
-                    
-                    if (typeof window.updateCabinetButton === 'function') {
-                        window.updateCabinetButton();
+            
                     }
                     if (typeof window.updateHeaderButton === 'function') {
                         window.updateHeaderButton();
