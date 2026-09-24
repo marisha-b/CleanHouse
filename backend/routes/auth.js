@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 
 function formatPhone(phone) {
     if (!phone) return phone;
@@ -41,7 +41,7 @@ function validatePassword(password) {
     return trimmed.length >= 4 && trimmed.length <= 50;
 }
 
-// ========== ВХОД ДЛЯ СОТРУДНИКОВ ==========
+// ВХОД ДЛЯ СОТРУДНИКОВ 
 router.post('/worker-login', async (req, res) => {
     try {
         const { role, phone, password } = req.body;
@@ -113,7 +113,7 @@ router.post('/worker-login', async (req, res) => {
     }
 });
 
-// ========== ВХОД ДЛЯ КЛИЕНТОВ ==========
+// ВХОД ДЛЯ КЛИЕНТОВ 
 router.post('/client-login', async (req, res) => {
     try {
         let { phone, password } = req.body;
@@ -160,7 +160,7 @@ router.post('/client-login', async (req, res) => {
     }
 });
 
-// ========== РЕГИСТРАЦИЯ КЛИЕНТА ==========
+//  РЕГИСТРАЦИЯ КЛИЕНТА 
 router.post('/client-register', async (req, res) => {
     try {
         let { full_name, phone, email, password } = req.body;
