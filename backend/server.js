@@ -12,7 +12,6 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 // Делаем кэш доступным для других модулей
 global.appCache = cache;
 
-//middleware для JSON запросы
 app.use(express.json());
 
 // Middleware для кэширования GET запросов
