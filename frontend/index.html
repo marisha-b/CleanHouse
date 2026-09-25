@@ -137,7 +137,7 @@ function updateHeaderButton() {
         try {
             const clientData = JSON.parse(client);
             const name = clientData.name || clientData.full_name || 'Клиент';
-            btn.textContent = `👤 ${name}`;
+            btn.textContent = `${name}`;
             btn.style.background = '#8B7355';
             btn.style.border = 'none';
             btn.onclick = function() {
