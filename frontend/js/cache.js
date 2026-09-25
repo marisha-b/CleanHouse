@@ -36,7 +36,6 @@ class ApiCache {
     // Очистка кэша
     clear() {
         this.cache.clear();
-        console.log('Кэш API очищен');
     }
 
     // Очистка кэша по URL
