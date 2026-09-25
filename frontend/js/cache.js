@@ -56,13 +56,11 @@ class ApiCache {
         if (isGetRequest) {
             const cached = this.get(cacheKey);
             if (cached) {
-                console.log(`Cache HIT: ${url}`);
                 return cached;
             }
         }
         
         // Выполняем запрос
-        console.log(`Cache MISS: ${url}`);
         const response = await fetch(url, options);
         const data = await response.json();
         
