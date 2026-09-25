@@ -93,7 +93,7 @@
 <div class="client-cabinet">
     <div class="client-header">
         <div>
-            <h1>👤 Личный кабинет</h1>
+            <h1>Личный кабинет</h1>
             <div class="client-info" id="clientInfo">Загрузка...</div>
         </div>
         <div>
@@ -188,7 +188,7 @@
             const orders = await res.json();
             
             if (orders.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;">🤷 У вас пока нет заказов<br><br><a href="prices.html" class="btn-add" style="display:inline-block;">Сделать первый заказ</a></div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;">У вас пока нет заказов<br><br><a href="prices.html" class="btn-add" style="display:inline-block;">Сделать первый заказ</a></div>';
                 return;
             }
             
@@ -198,7 +198,7 @@
                         <span class="order-id"> Заказ #${order.id}</span>
                         <span class="order-date"> ${new Date(order.order_date).toLocaleDateString()}</span>
                         <span class="order-status status-${order.status === 'completed' ? 'completed' : order.status === 'cancelled' ? 'cancelled' : order.status === 'in_progress' ? 'in-progress' : 'new'}">
-                            ${order.status === 'completed' ? ' Выполнен' : order.status === 'cancelled' ? ' Отменён' : order.status === 'in_progress' ? '🔄 В работе' : '🆕 Новый'}
+                            ${order.status === 'completed' ? ' Выполнен' : order.status === 'cancelled' ? ' Отменён' : order.status === 'in_progress' ? ' В работе' : ' Новый'}
                         </span>
                     </div>
                     <div><strong> Адрес:</strong> ${escapeHtml(order.address)}</div>
@@ -229,7 +229,7 @@
             if (!detailsDiv) return;
             
             // Услуги
-            let servicesHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong>🧹 Услуги:</strong>';
+            let servicesHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong> Услуги:</strong>';
             if (data.services && data.services.length > 0) {
                 data.services.forEach(s => {
                     servicesHtml += `<div class="service-item" onclick="event.stopPropagation()"><span>${escapeHtml(s.service_name)}</span><span>${s.price} ₽</span></div>`;
@@ -242,7 +242,7 @@
             // Сотрудники
             let workersHtml = '';
             if (data.workers && data.workers.length > 0) {
-                workersHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong>👨‍🔧 Исполнители:</strong>';
+                workersHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong> Исполнители:</strong>';
                 data.workers.forEach(w => {
                     workersHtml += `<div class="service-item" onclick="event.stopPropagation()"><span>${escapeHtml(w.full_name)}</span><span>${w.shift_date ? new Date(w.shift_date).toLocaleDateString() : ''}</span></div>`;
                 });
@@ -252,7 +252,7 @@
             // Отчёты
             let reportsHtml = '';
             if (data.reports && data.reports.length > 0) {
-                reportsHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong>📸 Отчёты по работе:</strong>';
+                reportsHtml = '<div class="services-list" onclick="event.stopPropagation()"><strong> Отчёты по работе:</strong>';
                 data.reports.forEach(r => {
                     reportsHtml += `
                         <div class="report-card" onclick="event.stopPropagation()">
@@ -407,7 +407,7 @@
             const container = document.getElementById('myReviewsContainer');
             
             if (reviews.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;">⭐ У вас пока нет отзывов<br><br>Оставьте отзыв после выполнения заказа</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;">У вас пока нет отзывов<br><br>Оставьте отзыв после выполнения заказа</div>';
                 return;
             }
             
