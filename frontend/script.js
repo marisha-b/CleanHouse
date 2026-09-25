@@ -1,4 +1,3 @@
-
 // ======================== ОБЩИЕ ФУНКЦИИ ========================
 async function loadComponent(elementId, componentPath) {
     try {
@@ -71,7 +70,7 @@ async function loadServices() {
     if (!container) return;
     
     try {
-        const response = await fetch('/api/services');
+        const response = await cachedFetch('/api/services'); //кешированный фетч
         const services = await response.json();
         
         const categories = {
@@ -117,7 +116,7 @@ async function loadReviews() {
     if (!container) return;
     
     try {
-        const response = await fetch('/api/reviews');
+        const response = await cachedFetch('/api/reviews'); //кешированный фетч
         allReviews = await response.json();
         
         if (allReviews.length === 0) {
