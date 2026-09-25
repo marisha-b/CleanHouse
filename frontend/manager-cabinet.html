@@ -188,7 +188,7 @@
 <!-- Модальное окно назначения сотрудника -->
 <div id="assignModal" class="assign-modal">
     <div class="assign-modal-content">
-        <h3>👨‍🔧 Назначить сотрудника</h3>
+        <h3> Назначить сотрудника</h3>
         <input type="hidden" id="assignOrderId">
         <div id="orderInfo" class="info-text">Загрузка...</div>
         <div class="form-group">
@@ -365,7 +365,7 @@
             const container = document.getElementById('newOrdersContainer');
             
             if (!orders || orders.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;">✨ Нет новых заказов</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;"> Нет новых заказов</div>';
                 return;
             }
             
@@ -382,7 +382,7 @@
                     <td>${new Date(order.order_date).toLocaleDateString()}</td>
                     <td>${order.time_slot || '09:00'}</td>
                     <td>${order.total_price} ₽</td>
-                    <td><button class="btn-assign" onclick="openAssignModal(${order.id})">👨‍🔧 Назначить</button></td>
+                    <td><button class="btn-assign" onclick="openAssignModal(${order.id})"> Назначить</button></td>
                 </tr>`;
             }
             html += '</tbody></table>';
@@ -401,7 +401,7 @@
             const container = document.getElementById('allOrdersContainer');
             
             if (!orders || orders.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;">📭 Нет заказов</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;"> Нет заказов</div>';
                 return;
             }
             
@@ -411,9 +411,9 @@
             
             for (const order of orders) {
                 let statusClass = '', statusText = '';
-                if (order.status === 'new') { statusClass = 'badge-new'; statusText = '🆕 Новый'; }
-                else if (order.status === 'in_progress') { statusClass = 'badge-progress'; statusText = '🔄 В работе'; }
-                else { statusClass = 'badge-completed'; statusText = '✅ Выполнен'; }
+                if (order.status === 'new') { statusClass = 'badge-new'; statusText = ' Новый'; }
+                else if (order.status === 'in_progress') { statusClass = 'badge-progress'; statusText = ' В работе'; }
+                else { statusClass = 'badge-completed'; statusText = ' Выполнен'; }
                 
                 let workersHtml = '';
                 if (order.workers && order.workers.length > 0 && order.workers[0]) {
@@ -429,7 +429,7 @@
                     <td>${new Date(order.order_date).toLocaleDateString()}</td>
                     <td><span class="badge ${statusClass}">${statusText}</span></td>
                     <td>${workersHtml}</td>
-                    <td><button class="btn-view" onclick="viewOrderDetails(${order.id})">📋 Детали</button></td>
+                    <td><button class="btn-view" onclick="viewOrderDetails(${order.id})"> Детали</button></td>
                 </tr>`;
             }
             html += '</tbody></table>';
@@ -448,7 +448,7 @@
             const container = document.getElementById('reportsContainer');
             
             if (!reports || reports.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;">📸 Нет отчётов</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;"> Нет отчётов</div>';
                 return;
             }
             
@@ -488,7 +488,7 @@
             const container = document.getElementById('reviewsContainer');
             
             if (!reviews || reviews.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;">⭐ Нет отзывов</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;"> Нет отзывов</div>';
                 return;
             }
             
