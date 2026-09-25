@@ -157,7 +157,7 @@
         <input type="file" id="afterPhoto" accept="image/*">
         <label>Фото "после"</label>
         <textarea id="reportComment" rows="3" placeholder="Комментарий к выполненной работе"></textarea>
-        <button class="btn-submit" onclick="submitReport()">📤 Отправить отчёт</button>
+        <button class="btn-submit" onclick="submitReport()"> Отправить отчёт</button>
     </div>
     
     <h2> Калькулятор зарплаты</h2>
@@ -167,7 +167,7 @@
             <input type="date" id="salaryStartDate">
             <label>Конец периода:</label>
             <input type="date" id="salaryEndDate">
-            <button class="btn-calc" onclick="calculateSalary()">📊 Рассчитать</button>
+            <button class="btn-calc" onclick="calculateSalary()"> Рассчитать</button>
         </div>
         
         <div id="salaryResult" class="salary-result" style="display: none;">
@@ -193,7 +193,7 @@
         </div>
         
         <div id="hoursDetails" style="display: none; margin-top: 20px;">
-            <h4>📋 Детализация по часам</h4>
+            <h4> Детализация по часам</h4>
             <div id="hoursDetailsTable"></div>
             <div class="total-salary" id="totalSalaryDisplay"></div>
         </div>
@@ -336,7 +336,7 @@
         } catch(e) { alert('Ошибка: ' + e.message); }
         finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = '📤 Отправить отчёт';
+            submitBtn.textContent = ' Отправить отчёт';
         }
     }
     
@@ -401,7 +401,7 @@
             tableHtml += '</tbody></table>';
             
             document.getElementById('hoursDetailsTable').innerHTML = tableHtml;
-            document.getElementById('totalSalaryDisplay').innerHTML = '<strong>💰 Итого: ' + Math.round(totalEarnings) + ' ₽ (' + totalHours + ' часов)</strong>';
+            document.getElementById('totalSalaryDisplay').innerHTML = '<strong> Итого: ' + Math.round(totalEarnings) + ' ₽ (' + totalHours + ' часов)</strong>';
             document.getElementById('hoursDetails').style.display = 'block';
             
             // Краткий результат
