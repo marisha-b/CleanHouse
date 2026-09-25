@@ -1,4 +1,3 @@
-// frontend/script.js - ОЧИЩЕННАЯ ВЕРСИЯ
 
 // ======================== ОБЩИЕ ФУНКЦИИ ========================
 async function loadComponent(elementId, componentPath) {
