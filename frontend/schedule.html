@@ -57,10 +57,10 @@
         </div>
         <div class="tabs-container">
             <div class="week-nav">
-                <button id="prevWeekBtn" class="refresh-btn">◀ Предыдущая неделя</button>
+                <button id="prevWeekBtn" class="refresh-btn">Предыдущая неделя</button>
                 <span id="weekRange">Загрузка...</span>
-                <button id="nextWeekBtn" class="refresh-btn">Следующая неделя ▶</button>
-                <button id="refreshBtn" class="refresh-btn" style="background: #8B7355;">🔄 Обновить</button>
+                <button id="nextWeekBtn" class="refresh-btn">Следующая неделя </button>
+                <button id="refreshBtn" class="refresh-btn" style="background: #8B7355;">Обновить</button>
             </div>
             <div id="scheduleContainer">
                 <div class="loading">Загрузка расписания...</div>
@@ -194,7 +194,7 @@
         if (allShifts.length === 0) await loadShifts();
         
         if (allWorkers.length === 0) {
-            container.innerHTML = '<div class="no-data">👥 Нет сотрудников в базе данных</div>';
+            container.innerHTML = '<div class="no-data"> Нет сотрудников в базе данных</div>';
             return;
         }
         
