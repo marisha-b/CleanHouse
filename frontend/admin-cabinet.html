@@ -400,7 +400,7 @@
     });
     
     async function clearCache() {
-        try { await fetch('/api/cache/clear', { method: 'POST' }); if (window.apiCache) window.apiCache.clear(); alert('✅ Кэш очищен'); location.reload(); } 
+        try { await fetch('/api/cache/clear', { method: 'POST' }); if (window.apiCache) window.apiCache.clear(); alert('Кэш очищен'); location.reload(); } 
         catch(e) { alert('Ошибка: ' + e.message); }
     }
     
@@ -473,7 +473,7 @@
             document.getElementById('financeRevenue').innerHTML = Math.round(data.revenue || 0).toLocaleString() + ' ₽';
             document.getElementById('financeExpenses').innerHTML = Math.round(data.expenses || 0).toLocaleString() + ' ₽';
             document.getElementById('financeProfit').innerHTML = Math.round(data.profit || 0).toLocaleString() + ' ₽';
-            document.getElementById('expensesDetails').innerHTML = `<p>Зарплаты сотрудников: ${Math.round(data.workers_salary || 0).toLocaleString()} ₽</p><p>📋 Зарплаты менеджеров: ${Math.round(data.managers_salary || 0).toLocaleString()} ₽</p>`;
+            document.getElementById('expensesDetails').innerHTML = `<p>Зарплаты сотрудников: ${Math.round(data.workers_salary || 0).toLocaleString()} ₽</p><p> Зарплаты менеджеров: ${Math.round(data.managers_salary || 0).toLocaleString()} ₽</p>`;
         } catch(e) { console.error(e); }
     }
     
@@ -486,7 +486,7 @@
             for (const w of workers) {
                 const rateRes = await fetch(`/api/salary/worker/${w.id}`);
                 const rateData = await rateRes.json();
-                html += `<div class="rate-item"><span><strong>${escapeHtml(w.full_name)}</strong></span><div class="rate-edit"><span>💰 ${rateData.hourly_rate || 500} ₽/час</span><button class="btn-edit" onclick="editRate(${w.id}, 'worker', ${rateData.hourly_rate || 500})">✏️</button></div></div>`;
+                html += `<div class="rate-item"><span><strong>${escapeHtml(w.full_name)}</strong></span><div class="rate-edit"><span> ${rateData.hourly_rate || 500} ₽/час</span><button class="btn-edit" onclick="editRate(${w.id}, 'worker', ${rateData.hourly_rate || 500})">✏️</button></div></div>`;
             }
             html += '</div>';
             document.getElementById('workersRatesList').innerHTML = html;
@@ -502,7 +502,7 @@
             for (const m of managers) {
                 const salaryRes = await fetch(`/api/salary/manager/${m.id}`);
                 const salaryData = await salaryRes.json();
-                html += `<div class="rate-item"><span><strong>${escapeHtml(m.full_name)}</strong></span><div class="rate-edit"><span>💰 ${salaryData.monthly_salary || 50000} ₽/мес</span><button class="btn-edit" onclick="editRate(${m.id}, 'manager', ${salaryData.monthly_salary || 50000})">✏️</button></div></div>`;
+                html += `<div class="rate-item"><span><strong>${escapeHtml(m.full_name)}</strong></span><div class="rate-edit"><span> ${salaryData.monthly_salary || 50000} ₽/мес</span><button class="btn-edit" onclick="editRate(${m.id}, 'manager', ${salaryData.monthly_salary || 50000})">✏️</button></div></div>`;
             }
             html += '</div>';
             document.getElementById('managersSalaryList').innerHTML = html;
@@ -575,7 +575,7 @@
                 else if (rating >= 3) barColor = 'linear-gradient(90deg, #FFC107, #FF8F00)';
                 else if (rating >= 2) barColor = 'linear-gradient(90deg, #FF9800, #E65100)';
                 else barColor = 'linear-gradient(90deg, #f44336, #c62828)';
-                return `<div class="rating-chart-item"><div class="rating-chart-header"><span><strong>${escapeHtml(w.full_name)}</strong></span><span>⭐ ${rating.toFixed(1)} / 5</span></div><div class="rating-chart-bar"><div class="rating-chart-fill" style="width:${percent}%; background:${barColor};">${rating>0?rating.toFixed(1)+' ⭐':'0 ⭐'}</div></div><div style="margin-top:5px; font-size:0.8rem; color:#666;">✅ ${w.orders_count || 0} выполненных заказов</div></div>`;
+                return `<div class="rating-chart-item"><div class="rating-chart-header"><span><strong>${escapeHtml(w.full_name)}</strong></span><span> ${rating.toFixed(1)} / 5</span></div><div class="rating-chart-bar"><div class="rating-chart-fill" style="width:${percent}%; background:${barColor};">${rating>0?rating.toFixed(1)+' ⭐':'0 ⭐'}</div></div><div style="margin-top:5px; font-size:0.8rem; color:#666;">✅ ${w.orders_count || 0} выполненных заказов</div></div>`;
             }).join('');
         } catch(e) { console.error(e); }
     }
@@ -603,11 +603,11 @@
             
             if (reviewsRatingChart) reviewsRatingChart.destroy();
             const ctx = document.getElementById('reviewsRatingChart').getContext('2d');
-            reviewsRatingChart = new Chart(ctx, { type: 'bar', data: { labels: ['⭐ 1', '⭐⭐ 2', '⭐⭐⭐ 3', '⭐⭐⭐⭐ 4', '⭐⭐⭐⭐⭐ 5'], datasets: [{ label: 'Количество отзывов', data: [distribution[1], distribution[2], distribution[3], distribution[4], distribution[5]], backgroundColor: '#FFD700', borderRadius: 8 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, stepSize: 1, title: { display: true, text: 'Количество отзывов' } } } } });
+            reviewsRatingChart = new Chart(ctx, { type: 'bar', data: { labels: [' 1', ' 2', ' 3', ' 4', ' 5'], datasets: [{ label: 'Количество отзывов', data: [distribution[1], distribution[2], distribution[3], distribution[4], distribution[5]], backgroundColor: '#FFD700', borderRadius: 8 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, stepSize: 1, title: { display: true, text: 'Количество отзывов' } } } } });
             
             const total = reviews.length;
             const avgRating = total > 0 ? (reviews.reduce((s,r)=>s+r.rating,0)/total).toFixed(1) : 0;
-            document.getElementById('reviewsDistribution').innerHTML = `<div style="display:flex; gap:20px; justify-content:center; margin-bottom:15px;"><div><strong>📝 Всего отзывов:</strong> ${total}</div><div><strong>⭐ Средний рейтинг:</strong> ${avgRating}</div></div><div class="rating-distribution">${Object.entries(distribution).reverse().map(([stars,count])=>`<div class="rating-bar-item"><div class="rating-label"><span>${'★'.repeat(parseInt(stars))}</span><span>${count} отзывов</span></div><div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${total>0?(count/total)*100:0}%;">${total>0?Math.round((count/total)*100):0}%</div></div></div>`).join('')}</div>`;
+            document.getElementById('reviewsDistribution').innerHTML = `<div style="display:flex; gap:20px; justify-content:center; margin-bottom:15px;"><div><strong> Всего отзывов:</strong> ${total}</div><div><strong>⭐ Средний рейтинг:</strong> ${avgRating}</div></div><div class="rating-distribution">${Object.entries(distribution).reverse().map(([stars,count])=>`<div class="rating-bar-item"><div class="rating-label"><span>${'★'.repeat(parseInt(stars))}</span><span>${count} отзывов</span></div><div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${total>0?(count/total)*100:0}%;">${total>0?Math.round((count/total)*100):0}%</div></div></div>`).join('')}</div>`;
         } catch(e) { console.error(e); }
     }
     
@@ -704,7 +704,7 @@
                     const salaryData = await salaryRes.json();
                     rate = `${salaryData.monthly_salary || 50000} ₽/мес`;
                 }
-                html += `<td><td>${u.id}</td><td>${escapeHtml(u.full_name)}</td><td>${escapeHtml(u.phone)}</td><td>${u.role === 'worker' ? '👨‍🔧 Сотрудник' : '📋 Менеджер'}</td><td>${rate}</td><td><button class="btn-edit" onclick="editEmployee(${u.id})">✏️</button><button class="btn-delete" onclick="deleteEmployee(${u.id})">🗑️</button></td></tr>`;
+                html += `<td><td>${u.id}</td><td>${escapeHtml(u.full_name)}</td><td>${escapeHtml(u.phone)}</td><td>${u.role === 'worker' ? ' Сотрудник' : ' Менеджер'}</td><td>${rate}</td><td><button class="btn-edit" onclick="editEmployee(${u.id})">✏️</button><button class="btn-delete" onclick="deleteEmployee(${u.id})">🗑️</button></td></tr>`;
             }
             document.getElementById('employeesTableBody').innerHTML = html;
         } catch(e) { console.error(e); }
@@ -832,7 +832,7 @@ async function openShiftsCalendar() {
                     </div>
                     <div class="shifts-modal-footer">
                         <button class="btn-add" onclick="closeShiftsModal()" style="background: #5D4A36;">Закрыть</button>
-                        <button class="btn-add" onclick="location.href='manager-cabinet.html'" style="background: #8B7355;">✏️ Перейти к управлению</button>
+                        <button class="btn-add" onclick="location.href='manager-cabinet.html'" style="background: #8B7355;"> Перейти к управлению</button>
                     </div>
                 </div>
             </div>
