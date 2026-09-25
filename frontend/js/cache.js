@@ -36,7 +36,7 @@ class ApiCache {
     // Очистка кэша
     clear() {
         this.cache.clear();
-        console.log('🧹 Кэш API очищен');
+        console.log('Кэш API очищен');
     }
 
     // Очистка кэша по URL
@@ -57,13 +57,13 @@ class ApiCache {
         if (isGetRequest) {
             const cached = this.get(cacheKey);
             if (cached) {
-                console.log(`📦 Cache HIT: ${url}`);
+                console.log(`Cache HIT: ${url}`);
                 return cached;
             }
         }
         
         // Выполняем запрос
-        console.log(`🌐 Cache MISS: ${url}`);
+        console.log(`Cache MISS: ${url}`);
         const response = await fetch(url, options);
         const data = await response.json();
         
