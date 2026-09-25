@@ -1,4 +1,4 @@
-// frontend/js/cache.js - модуль для кэширования запросов
+// модуль для кэширования запросов
 
 class ApiCache {
     constructor() {
